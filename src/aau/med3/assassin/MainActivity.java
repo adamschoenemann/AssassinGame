@@ -1,5 +1,7 @@
-package com.example.firstapp;
+package aau.med3.assassin;
 
+
+import aau.med3.assassin.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

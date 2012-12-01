@@ -1,19 +1,27 @@
-package com.example.firstapp;
+package aau.med3.assassin;
 
 import java.util.HashMap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 
+// TODO: Implement methods for reading and updating and deleting
 public class User implements DataListener {
 	
 	private String _url = "user/";
 	public DataListener listener;
 	
-	public void create(UserData data){
-		String url = _url + "create";
+	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
-		req.domain = Globals.serverLocation + url;		
-		req.params = (HashMap<String, String>) data;
+		req.domain = Globals.serverLocation + _url + str;		
 		req.listener = this;
+		return req;
+	}
+	
+	public void create(UserData data){
+		
+		AsyncHttpRequest req = setupRequest("create");
+		req.params = (HashMap<String, String>) data;
 		req.execute("");
 		
 		/* COPY USERDATA TO PARAMS
@@ -27,7 +35,9 @@ public class User implements DataListener {
 	}
 	
 	public void read(Integer ID){
-		String url= _url + "read";
+		AsyncHttpRequest req = setupRequest("read");
+		req.params.put("ID", ID.toString());
+		req.execute("");
 	}
 	
 	public void update(UserData data){
@@ -39,8 +49,14 @@ public class User implements DataListener {
 	}
 
 	@Override
-	public void onDataComplete(String data) {
+	public void onDataComplete(Object data) {
+		try {
+			JSONArray json = new JSONArray(data.toString());
+			listener.onDataComplete(data);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		listener.onDataComplete(data);
 	}
 }

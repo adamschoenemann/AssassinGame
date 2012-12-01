@@ -1,14 +1,17 @@
-package com.example.firstapp;
+package aau.med3.assassin;
 
 import java.io.IOException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+
+import aau.med3.assassin.R;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,23 +83,30 @@ public class SignInActivity extends Activity implements DataListener {
 		usr.listener = this;
 		usr.create(usrData);
 		
-		/*
-		req.listener = this;
-		req.domain = "10.0.2.2/android_test/user/read";
-		req.params.put("ID", "8");
-		req.params.put("first_name", firstName);
-		req.params.put("last_name", lastName);
-
-		req.execute("hey");
-
-		*/
+		// Display Alert
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("User Registration")
+			.setMessage("User succesfully created")
+			.setCancelable(false)
+			.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int id){
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog dialog = builder.create();
+		
+		dialog.show();
+		
+		
 	}
 	
-	public void onDataComplete(String data){
+	public void onDataComplete(Object data){
 		Log.d("DEBUG", "Returned data: " + data);
 		try {
 			
-			JSONArray json = new JSONArray(data);
+			JSONArray json = new JSONArray(data.toString());
 			Log.d("DEBUG", "[0]: " + json.getJSONObject(0).toString());
 			
 			

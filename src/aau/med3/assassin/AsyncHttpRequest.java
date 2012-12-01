@@ -1,4 +1,4 @@
-package com.example.firstapp;
+package aau.med3.assassin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,8 +48,7 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	@Override
 	protected String doInBackground(String... urls){
 		try {
-//			URL url = new URL("http://10.0.0.2/android_test/user/create?username=from_android");
-//			URL url = new URL(urls[0]);
+
 			String base = protocol + "://" + domain + "?";
 			String pars = "";
 			

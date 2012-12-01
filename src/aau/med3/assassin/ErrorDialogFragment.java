@@ -1,4 +1,4 @@
-package com.example.firstapp;
+package aau.med3.assassin;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
