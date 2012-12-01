@@ -1,19 +1,23 @@
 package com.example.firstapp;
 
 import java.io.IOException;
-import java.net.URLEncoder;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SignInActivity extends Activity {
+public class SignInActivity extends Activity implements DataListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,24 +54,56 @@ public class SignInActivity extends Activity {
 	}
 	
 	public void onSubmitClicked(View view) throws IOException{
-		AsyncHttpRequest req = new AsyncHttpRequest();
-//		String url = "http://10.0.2.2/android_test/user/create?";
-//		String encoding = "utf-8";
-		TextView tv = (TextView) findViewById(R.id.form_firstName);
-		String firstName = tv.getText().toString();
-		tv = (TextView) findViewById(R.id.form_lastName);
-		String lastName = tv.getText().toString();
-//		String userName = "android_user";
-//		url += "username=" + userName + "&first_name=" + firstName + "&last_name=" + lastName;
-//		Log.d("DEBUG", url);
 		
-		req.domain = "10.0.2.2/android_test/user/create?";
+		UserData usrData = new UserData();
+		LinearLayout viewParent = (LinearLayout) findViewById(R.id.user_create_layout);
+		int count = viewParent.getChildCount();
+		
+		for(int i = 0; i < count; i++){
+			View v = (View) viewParent.getChildAt(i);
+			
+			if(v.getTag() == null){
+				continue;
+			}
+			
+			if(v instanceof TextView){
+				usrData.put(v.getTag().toString(), ((TextView) v).getText().toString());
+			}
+			else if(v instanceof Spinner){
+				usrData.put(v.getTag().toString(), ((Spinner) v).getSelectedItem().toString());;
+			}
+		}
+		
+
+		User usr = new User();
+		
+		usr.listener = this;
+		usr.create(usrData);
+		
+		/*
+		req.listener = this;
+		req.domain = "10.0.2.2/android_test/user/read";
+		req.params.put("ID", "8");
 		req.params.put("first_name", firstName);
 		req.params.put("last_name", lastName);
-//		req.execute("http://10.0.2.2/android_test/user/create?username=from_android");
+
 		req.execute("hey");
 
-
+		*/
+	}
+	
+	public void onDataComplete(String data){
+		Log.d("DEBUG", "Returned data: " + data);
+		try {
+			
+			JSONArray json = new JSONArray(data);
+			Log.d("DEBUG", "[0]: " + json.getJSONObject(0).toString());
+			
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

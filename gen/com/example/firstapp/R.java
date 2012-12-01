@@ -20,14 +20,14 @@ public final class R {
         public static final int btn_sign_in=0x7f080000;
         public static final int form_educations=0x7f080005;
         public static final int form_email=0x7f080008;
-        public static final int form_firstName=0x7f080002;
-        public static final int form_lastName=0x7f080003;
+        public static final int form_first_name=0x7f080002;
+        public static final int form_last_name=0x7f080003;
         public static final int form_pwd=0x7f080007;
         public static final int form_submit=0x7f080009;
         public static final int label_form_educations=0x7f080004;
         public static final int label_form_pwd=0x7f080006;
-        public static final int linearLayout1=0x7f080001;
         public static final int menu_settings=0x7f08000a;
+        public static final int user_create_layout=0x7f080001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -40,14 +40,9 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f040000;
         public static final int btn_sign_in=0x7f040003;
-        public static final int educations_BEM=0x7f040007;
-        public static final int educations_HumInf=0x7f040006;
-        public static final int educations_ITCom=0x7f04000a;
-        public static final int educations_Lan=0x7f040009;
-        public static final int educations_Med=0x7f040005;
-        public static final int educations_TekAnt=0x7f040008;
         public static final int hello_world=0x7f040001;
         public static final int menu_settings=0x7f040002;
+        public static final int server_location=0x7f040005;
         public static final int title_activity_sign_in=0x7f040004;
     }
     public static final class style {

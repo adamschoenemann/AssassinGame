@@ -1,6 +1,9 @@
 package com.example.firstapp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,17 +23,37 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	public String protocol = "http";
 	public String domain;
 	public String encoding = "utf-8";
+	public DataListener listener;
 	public HashMap<String, String> params = new HashMap<String, String>();
 	
 	
+	protected String readStream(InputStream in){
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
+			StringBuilder sb = new StringBuilder();
+			String line = "";
+			while((line = reader.readLine()) != null){
+				sb.append(line);
+			}
+			
+			reader.close();
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
 	@Override
-	protected String doInBackground(String... urls) {
+	protected String doInBackground(String... urls){
 		try {
 //			URL url = new URL("http://10.0.0.2/android_test/user/create?username=from_android");
 //			URL url = new URL(urls[0]);
 			String base = protocol + "://" + domain + "?";
 			String pars = "";
 			
+			// Iterate through hashmap
 			Set<Entry<String, String>> set = params.entrySet();
 			Iterator<Entry<String, String>> iter = set.iterator();
 			while(iter.hasNext()){
@@ -40,26 +63,34 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 			pars = pars.substring(0, pars.length() - 1);
 			
 			URL url = new URL(base + pars);
+			Log.d("DEBUG", "URL: " + url.toExternalForm());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String ret = readStream(con.getInputStream());
 			
 			Log.d("DEBUG", con.getResponseMessage());
 			con.disconnect();
-			return con.getResponseMessage();
+			
+			
+			return ret;
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+
+			Log.d("DEBUG", e.toString());
 //			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
+
+			Log.d("DEBUG", e.toString());
 		}
-		return null;
+		return "";
 	}
 	
 	@Override
 	protected void onPostExecute(String result){
 		super.onPostExecute(result);
-		
-		Log.d("DEBUG", result);
+		if(listener != null){
+			listener.onDataComplete(result);
+		}
+				
 		
 	}
 	

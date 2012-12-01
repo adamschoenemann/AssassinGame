@@ -15,11 +15,6 @@
         <item>Landinspektør</item>
     </string-array>
     
-    <string name="educations_Med">Medialogy</string>
-    <string name="educations_HumInf">Humanistisk Informatik</string>
-    <string name="educations_BEM">By Energi og Miljø</string>
-    <string name="educations_TekAnt">Teknoantropologi</string>
-    <string name="educations_Lan">Landinspektør</string>
-    <string name="educations_ITCom">IT and Communication</string>
+  	<string name="server_location">10.0.2.2/android_test/</string>
 
 </resources>

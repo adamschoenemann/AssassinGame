@@ -5,7 +5,7 @@
     tools:context=".SignInActivity" >
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/user_create_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -15,21 +15,23 @@
         android:paddingTop="5dp" >
 
         <EditText
-            android:id="@+id/form_firstName"
+            android:id="@+id/form_first_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="textPersonName"
+            android:tag="first_name"
             android:text="First Name" >
 
             <requestFocus />
         </EditText>
 
         <EditText
-            android:id="@+id/form_lastName"
+            android:id="@+id/form_last_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
+            android:tag="last_name"
             android:text="Last Name" />
 
         <TextView
@@ -43,7 +45,8 @@
             android:id="@+id/form_educations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/educations" />
+            android:entries="@array/educations"
+            android:tag="education" />
 
         <TextView
             android:id="@+id/label_form_pwd"
@@ -58,6 +61,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPassword"
+            android:tag="password"
             android:text="Password" />
 
         <EditText
@@ -66,7 +70,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textEmailAddress"
-            android:text="Email" />
+            android:tag="email"
+            android:text="test@email.com" />
 
         <Button
             android:id="@+id/form_submit"
