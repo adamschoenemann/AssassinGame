@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FirstApp</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="btn_sign_in">Sign In</string>
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string-array name="educations">
+        <item>Medialogy</item>
+        <item>Humanistisk Informatik</item>
+        <item>Tekno-Antropology</item>
+        <item>By Miljø og Energi</item>
+        <item>IT and Communication</item>
+        <item>Landinspektør</item>
+    </string-array>
+    
+    <string name="educations_Med">Medialogy</string>
+    <string name="educations_HumInf">Humanistisk Informatik</string>
+    <string name="educations_BEM">By Energi og Miljø</string>
+    <string name="educations_TekAnt">Teknoantropologi</string>
+    <string name="educations_Lan">Landinspektør</string>
+    <string name="educations_ITCom">IT and Communication</string>
+
+</resources>
