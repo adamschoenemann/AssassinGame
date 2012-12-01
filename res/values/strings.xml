@@ -6,6 +6,7 @@
     <string name="menu_settings">Settings</string>
     <string name="btn_sign_in">Sign In</string>
     <string name="title_activity_sign_in">SignInActivity</string>
+
     <string-array name="educations">
         <item>Medialogy</item>
         <item>Humanistisk Informatik</item>
@@ -14,7 +15,8 @@
         <item>IT and Communication</item>
         <item>Landinspektør</item>
     </string-array>
-    
-  	<string name="server_location">10.0.2.2/android_test/</string>
+
+    <string name="server_location">10.0.2.2/android_test/</string>
+    <string name="title_activity_game">GameActivity</string>
 
 </resources>

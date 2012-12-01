@@ -1,4 +1,4 @@
-package aau.med3.assassin;
+package aau.med3.assassin.activities;
 
 import java.io.IOException;
 
@@ -6,7 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 
+import aau.med3.assassin.DataListener;
 import aau.med3.assassin.R;
+import aau.med3.assassin.User;
+import aau.med3.assassin.UserData;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,7 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SignInActivity extends Activity implements DataListener {
+public class SignUpActivity extends Activity implements DataListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
