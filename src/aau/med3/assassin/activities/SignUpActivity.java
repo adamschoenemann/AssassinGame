@@ -4,15 +4,17 @@ import java.io.IOException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
+import org.json.JSONObject;
 
 import aau.med3.assassin.DataListener;
+import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.User;
 import aau.med3.assassin.UserData;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -105,12 +107,31 @@ public class SignUpActivity extends Activity implements DataListener {
 		
 	}
 	
+	// USER sends data of type JSONArray
 	public void onDataComplete(Object data){
-		Log.d("DEBUG", "Returned data: " + data);
+		
 		try {
 			
-			JSONArray json = new JSONArray(data.toString());
-			Log.d("DEBUG", "[0]: " + json.getJSONObject(0).toString());
+			JSONArray json = (JSONArray) data;
+			JSONObject obj = json.getJSONObject(0);
+			Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
+			SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+			
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putInt("ID", obj.getInt("ID"));
+			editor.putString("email", obj.getString("email"));
+			editor.putString("first_name", obj.getString("first_name"));
+			editor.putString("last_name", obj.getString("last_name"));
+			editor.putInt("alive", obj.getInt("alive"));
+			editor.putString("education", obj.getString("education"));
+			editor.putString("password", obj.getString("password"));
+			editor.putInt("target", obj.getInt("target"));
+			editor.putString("phone_id", obj.getString("phone_id"));
+			editor.putInt("point", obj.getInt("points"));
+			
+			
+			editor.commit();
+			Log.d(Globals.DEBUG, "[0]: " + json.getJSONObject(0).toString());
 			
 			
 		} catch (JSONException e) {

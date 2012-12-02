@@ -1,5 +1,10 @@
-package aau.med3.assassin;
+package aau.med3.assassin.activities;
 
+import aau.med3.assassin.R;
+import aau.med3.assassin.R.id;
+import aau.med3.assassin.R.layout;
+import aau.med3.assassin.R.menu;
+import aau.med3.assassin.R.string;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;

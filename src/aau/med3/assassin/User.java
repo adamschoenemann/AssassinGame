@@ -13,7 +13,7 @@ public class User implements DataListener {
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
-		req.domain = Globals.serverLocation + _url + str;		
+		req.domain = Globals.SERVER_LOCATION + _url + str;		
 		req.listener = this;
 		return req;
 	}
@@ -52,7 +52,7 @@ public class User implements DataListener {
 	public void onDataComplete(Object data) {
 		try {
 			JSONArray json = new JSONArray(data.toString());
-			listener.onDataComplete(data);
+			listener.onDataComplete(json);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

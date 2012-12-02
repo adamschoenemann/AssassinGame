@@ -15,13 +15,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="aau.med3.assassin.AssassinGame"
+        android:name="AssassinGame"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.firstapp.MainActivity"
+            android:name="aau.med3.assassin.activities.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,15 +30,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="aau.med3.assassin.SignInActivity"
+            android:name="aau.med3.assassin.activities.SignUpActivity"
             android:label="@string/title_activity_sign_in"
-            android:parentActivityName="com.example.firstapp.MainActivity" >
+            android:parentActivityName="aau.med3.assassin.activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.firstapp.MainActivity" />
+                android:value="aau.med3.assassin.activities.MainActivity" />
         </activity>
         <activity
-            android:name="aau.med3.assassin.LoginActivity"
+            android:name="aau.med3.assassin.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName="aau.med3.assassin.activities.MainActivity"
             android:windowSoftInputMode="adjustResize|stateVisible" >
@@ -47,7 +47,7 @@
                 android:value="aau.med3.assassin.activities.MainActivity" />
         </activity>
         <activity
-            android:name="aau.med3.assassin.GameActivity"
+            android:name="aau.med3.assassin.activities.GameActivity"
             android:label="@string/title_activity_game"
             android:parentActivityName="aau.med3.assassin.activities.MainActivity" >
             <meta-data
@@ -55,7 +55,7 @@
                 android:value="aau.med3.assassin.activities.MainActivity" />
         </activity>
         <activity
-            android:name="aau.med3.assassin.SettingsActivity"
+            android:name="aau.med3.assassin.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName="aau.med3.assassin.activities.MainActivity" >
             <meta-data

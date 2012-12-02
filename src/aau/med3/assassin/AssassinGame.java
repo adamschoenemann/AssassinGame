@@ -1,7 +1,17 @@
 package aau.med3.assassin;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 public class AssassinGame extends Application {
-	public String test = "WORKING!";
+	
+	@Override
+	public void onCreate(){
+		Log.d(Globals.DEBUG, "Game started!");
+		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+		Integer ID = prefs.getInt("ID", 0);
+		Log.d(Globals.DEBUG, "I HAS STARTEEED!!!!!");
+		Log.d(Globals.DEBUG, "User_ID: " + ID.toString());
+	}
 }
