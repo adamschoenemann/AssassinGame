@@ -1,10 +1,14 @@
-package aau.med3.assassin;
-
-import java.net.ConnectException;
-import java.util.HashMap;
+package aau.med3.assassin.CRUD;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import aau.med3.assassin.AsyncHttpRequest;
+import aau.med3.assassin.DB;
+import aau.med3.assassin.DataListener;
+import aau.med3.assassin.Globals;
+import aau.med3.assassin.ServerInfo;
 
 // TODO: Implement methods for reading and updating and deleting
 public class User implements DataListener<String> {
@@ -14,29 +18,39 @@ public class User implements DataListener<String> {
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
-		req.domain = Globals.SERVER_LOCATION + _url + str;		
+		req.domain = ServerInfo.LOCATION + _url + str;		
 		req.listener = this;
 		return req;
 	}
 	
 	
-	public void create(UserData data){
+	public void create(JSONObject data){
 		
 		AsyncHttpRequest req = setupRequest("create");
-		req.params = (HashMap<String, String>) data;
+		req.params = data;
 		req.execute("");
 		
 	}
 	
 	public void read(Integer ID){
 		AsyncHttpRequest req = setupRequest("read");
-		req.params.put("ID", ID.toString());
+		JSONObject json;
+		try {
+			json = new JSONObject();
+//			json.put(DB.users.ID, ID);
+			json.put(DB.userCols.getString("ID"), ID);
+			req.params = json;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		req.execute("");
 	}
 	
-	public void update(UserData data){
+	public void update(JSONObject data){
 		AsyncHttpRequest req = setupRequest("update");
-		req.params = (HashMap<String, String>) data;
+		req.params = data;
 		req.execute("");
 		
 	}
@@ -49,7 +63,7 @@ public class User implements DataListener<String> {
 	public void onDataComplete(String data){
 		try {
 			JSONArray json = new JSONArray(data.toString());
-			listener.onDataComplete(json);
+			if(listener != null) listener.onDataComplete(json);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

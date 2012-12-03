@@ -7,12 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import aau.med3.assassin.DB;
 import aau.med3.assassin.DataListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
-import aau.med3.assassin.User;
-import aau.med3.assassin.UserData;
+import aau.med3.assassin.CRUD.Phone;
+import aau.med3.assassin.CRUD.User;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -27,7 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SignUpActivity extends Activity implements DataListener<JSONArray> {
+public class SignUpActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,98 +66,131 @@ public class SignUpActivity extends Activity implements DataListener<JSONArray> 
 	
 	public void onSubmitClicked(View view) throws IOException{
 		
-		UserData usrData = new UserData();
-		LinearLayout viewParent = (LinearLayout) findViewById(R.id.user_create_layout);
-		int count = viewParent.getChildCount();
-		
-		// Collect form data
-		for(int i = 0; i < count; i++){
-			View v = (View) viewParent.getChildAt(i);
+		JSONObject usrData;
+		try {
+			usrData = new JSONObject();
+			LinearLayout viewParent = (LinearLayout) findViewById(R.id.user_create_layout);
+			int count = viewParent.getChildCount();
 			
-			if(v.getTag() == null){
-				continue;
-			}
-			
-			if(v instanceof TextView){
-				if(v.getId() == R.id.form_pwd){ // If password field
-					
-					String plainpw = ((TextView) v).getText().toString();
-					String sha1;
-					try {
-						sha1 = SimpleSHA1.SHA1(plainpw);
-						Log.d(Globals.DEBUG, "Encrypted pwd: " + sha1);
-						usrData.put(v.getTag().toString(), sha1);
-					} catch (NoSuchAlgorithmException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					
-				} else {
-					usrData.put(v.getTag().toString(), ((TextView) v).getText().toString());
+			// Collect form data
+			for(int i = 0; i < count; i++){
+				View v = (View) viewParent.getChildAt(i);
+				
+				if(v.getTag() == null){
+					continue;
 				}
 				
+				if(v instanceof TextView){
+					if(v.getId() == R.id.form_pwd){ // If password field
+						
+						String plainpw = ((TextView) v).getText().toString();
+						String sha1;
+						try {
+							sha1 = SimpleSHA1.SHA1(plainpw);
+							Log.d(Globals.DEBUG, "Encrypted pwd: " + sha1);
+							usrData.put(v.getTag().toString(), sha1);
+						} catch (NoSuchAlgorithmException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						
+					} else {
+						usrData.put(v.getTag().toString(), ((TextView) v).getText().toString());
+					}
+					
+				}
+				else if(v instanceof Spinner){
+					usrData.put(v.getTag().toString(), ((Spinner) v).getSelectedItem().toString());;
+				}
 			}
-			else if(v instanceof Spinner){
-				usrData.put(v.getTag().toString(), ((Spinner) v).getSelectedItem().toString());;
-			}
+			
+			User usr = new User();
+			usr.listener = new UserDataHandler();
+			usr.create(usrData);
+			
+			Phone phone = new Phone();
+			JSONObject phoneData = new JSONObject();
+			phoneData.put("MAC", "02-43-77-21-45");
+			phone.listener = new PhoneDataHandler();
+			phone.create(phoneData);
+			
+		} catch (JSONException e){
+			e.printStackTrace();
 		}
-		
 
-		User usr = new User();
 		
-		usr.listener = this;
-		usr.create(usrData);
 		
 				
 	}
 	
-	// USER sends data of type JSONArray
-	public void onDataComplete(JSONArray data){
-		
-		try {
+	public class UserDataHandler implements DataListener<JSONArray>{
+		public void onDataComplete(JSONArray data){
 			
-			JSONArray json = data;
-			JSONObject obj = json.getJSONObject(0);
-			Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
-			SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
-			
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.putInt("ID", obj.getInt("ID"));
-			editor.putString("email", obj.getString("email"));
-			editor.putString("first_name", obj.getString("first_name"));
-			editor.putString("last_name", obj.getString("last_name"));
-			editor.putInt("alive", obj.getInt("alive"));
-			editor.putString("education", obj.getString("education"));
-			editor.putString("password", obj.getString("password"));
-			editor.putInt("target", obj.getInt("target"));
-			editor.putString("phone_id", obj.getString("phone_id"));
-			editor.putInt("point", obj.getInt("points"));
-			
-			
-			editor.commit();
-			Log.d(Globals.DEBUG, "[0]: " + json.getJSONObject(0).toString());
-			
-			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// Display Success Alert
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("User Registration")
-			.setMessage("User succesfully created")
-			.setCancelable(false)
-			.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+			try {
 				
-				public void onClick(DialogInterface dialog, int id){
-					dialog.cancel();
-				}
-			});
-		
-		AlertDialog dialog = builder.create();
-		
-		dialog.show();
+				JSONArray json = data;
+				JSONObject obj = json.getJSONObject(0);
+				Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
+				SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+				
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putInt(DB.users.ID, obj.getInt("ID"));
+				editor.putString(DB.users.email, obj.getString("email"));
+				editor.putInt(DB.users.alive, obj.getInt("alive"));
+				editor.putString(DB.users.education, obj.getString("education"));
+				editor.putString(DB.users.password, obj.getString("password"));
+				editor.putInt(DB.users.target_ID, obj.getInt("target_ID"));
+				editor.putString(DB.users.phone_ID, obj.getString("phone_ID"));
+				editor.putInt(DB.users.points, obj.getInt("points"));
+				
+				
+				editor.commit();
+				Log.d(Globals.DEBUG, "[0]: " + json.getJSONObject(0).toString());
+				
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// Display Success Alert
+			AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+			builder.setTitle("User Registration")
+				.setMessage("User succesfully created")
+				.setCancelable(false)
+				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+					
+					public void onClick(DialogInterface dialog, int id){
+						dialog.cancel();
+					}
+				});
+			
+			AlertDialog dialog = builder.create();
+			
+			dialog.show();
+		}
 	}
+	
+	public class PhoneDataHandler implements DataListener<JSONArray>{
+		@Override
+		public void onDataComplete(JSONArray data) {
+			try {
+				SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+				SharedPreferences.Editor editor = prefs.edit();
+				JSONObject json = data.getJSONObject(0);
+			
+				editor.putString("MAC", json.getString("MAC"));
+				editor.putInt("phone_ID", json.getInt("ID"));
+				
+				editor.commit();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+
+	
 
 }

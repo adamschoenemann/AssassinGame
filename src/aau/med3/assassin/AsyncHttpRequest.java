@@ -8,11 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -24,7 +23,8 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	public String domain;
 	public String encoding = "utf-8";
 	public DataListener<String> listener;
-	public HashMap<String, String> params = new HashMap<String, String>();
+	public JSONObject params;
+//	public HashMap<String, String> params = new HashMap<String, String>();
 	
 	protected String readStream(InputStream in){
 		BufferedReader reader = null;
@@ -51,16 +51,16 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 			String base = protocol + "://" + domain + "?";
 			String pars = "";
 			
-			// Iterate through hashmap
-			Set<Entry<String, String>> set = params.entrySet();
-			Iterator<Entry<String, String>> iter = set.iterator();
-			while(iter.hasNext()){
-				Map.Entry<String, String> entry = (Entry<String, String>) iter.next();
-				pars += URLEncoder.encode(entry.getKey(), encoding) + "=" + URLEncoder.encode(entry.getValue(), encoding) + "&";
+			// Create params
+			Iterator<?> keys = params.keys();
+			while(keys.hasNext()){
+				String key = (String) keys.next();
+				String value = params.getString(key);
+				pars += URLEncoder.encode(key, encoding) + "=" + URLEncoder.encode(value, encoding) + "&";
 			}
 			pars = pars.substring(0, pars.length() - 1);
-			
 			URL url = new URL(base + pars);
+			
 			Log.d("DEBUG", "URL: " + url.toExternalForm());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			
@@ -76,6 +76,10 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 			e.printStackTrace();
 			cancel(true);
 		} catch (IOException e) {
+			exception = e;
+			e.printStackTrace();
+			cancel(true);
+		} catch (JSONException e) {
 			exception = e;
 			e.printStackTrace();
 			cancel(true);
