@@ -1,15 +1,16 @@
 package aau.med3.assassin;
 
+import java.net.ConnectException;
 import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 // TODO: Implement methods for reading and updating and deleting
-public class User implements DataListener {
+public class User implements DataListener<String> {
 	
 	private String _url = "user/";
-	public DataListener listener;
+	public DataListener<JSONArray> listener;
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
@@ -18,20 +19,13 @@ public class User implements DataListener {
 		return req;
 	}
 	
+	
 	public void create(UserData data){
 		
 		AsyncHttpRequest req = setupRequest("create");
 		req.params = (HashMap<String, String>) data;
 		req.execute("");
 		
-		/* COPY USERDATA TO PARAMS
-		Set<Entry<String, String>> set = params.entrySet();
-		Iterator<Entry<String, String>> iter = set.iterator();
-		while(iter.hasNext()){
-			Map.Entry<String, String> entry = (Entry<String, String>) iter.next();
-			pars += URLEncoder.encode(entry.getKey(), encoding) + "=" + URLEncoder.encode(entry.getValue(), encoding) + "&";
-		}
-		*/
 	}
 	
 	public void read(Integer ID){
@@ -41,7 +35,10 @@ public class User implements DataListener {
 	}
 	
 	public void update(UserData data){
-		String url = _url + "update";
+		AsyncHttpRequest req = setupRequest("update");
+		req.params = (HashMap<String, String>) data;
+		req.execute("");
+		
 	}
 	
 	public void delete(Integer ID){
@@ -49,7 +46,7 @@ public class User implements DataListener {
 	}
 
 	@Override
-	public void onDataComplete(Object data) {
+	public void onDataComplete(String data){
 		try {
 			JSONArray json = new JSONArray(data.toString());
 			listener.onDataComplete(json);

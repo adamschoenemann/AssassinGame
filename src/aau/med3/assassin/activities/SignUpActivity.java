@@ -1,6 +1,7 @@
 package aau.med3.assassin.activities;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 import aau.med3.assassin.DataListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
+import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.User;
 import aau.med3.assassin.UserData;
 import android.app.Activity;
@@ -25,12 +27,12 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SignUpActivity extends Activity implements DataListener {
+public class SignUpActivity extends Activity implements DataListener<JSONArray> {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_sign_in);
+		setContentView(R.layout.activity_sign_up);
 		
 		
 		// Show the Up button in the action bar.
@@ -67,6 +69,7 @@ public class SignUpActivity extends Activity implements DataListener {
 		LinearLayout viewParent = (LinearLayout) findViewById(R.id.user_create_layout);
 		int count = viewParent.getChildCount();
 		
+		// Collect form data
 		for(int i = 0; i < count; i++){
 			View v = (View) viewParent.getChildAt(i);
 			
@@ -75,7 +78,24 @@ public class SignUpActivity extends Activity implements DataListener {
 			}
 			
 			if(v instanceof TextView){
-				usrData.put(v.getTag().toString(), ((TextView) v).getText().toString());
+				if(v.getId() == R.id.form_pwd){ // If password field
+					
+					String plainpw = ((TextView) v).getText().toString();
+					String sha1;
+					try {
+						sha1 = SimpleSHA1.SHA1(plainpw);
+						Log.d(Globals.DEBUG, "Encrypted pwd: " + sha1);
+						usrData.put(v.getTag().toString(), sha1);
+					} catch (NoSuchAlgorithmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
+				} else {
+					usrData.put(v.getTag().toString(), ((TextView) v).getText().toString());
+				}
+				
 			}
 			else if(v instanceof Spinner){
 				usrData.put(v.getTag().toString(), ((Spinner) v).getSelectedItem().toString());;
@@ -88,31 +108,15 @@ public class SignUpActivity extends Activity implements DataListener {
 		usr.listener = this;
 		usr.create(usrData);
 		
-		// Display Alert
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("User Registration")
-			.setMessage("User succesfully created")
-			.setCancelable(false)
-			.setNegativeButton("OK", new DialogInterface.OnClickListener() {
 				
-				public void onClick(DialogInterface dialog, int id){
-					dialog.cancel();
-				}
-			});
-		
-		AlertDialog dialog = builder.create();
-		
-		dialog.show();
-		
-		
 	}
 	
 	// USER sends data of type JSONArray
-	public void onDataComplete(Object data){
+	public void onDataComplete(JSONArray data){
 		
 		try {
 			
-			JSONArray json = (JSONArray) data;
+			JSONArray json = data;
 			JSONObject obj = json.getJSONObject(0);
 			Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
 			SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
@@ -138,6 +142,21 @@ public class SignUpActivity extends Activity implements DataListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Display Success Alert
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("User Registration")
+			.setMessage("User succesfully created")
+			.setCancelable(false)
+			.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int id){
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog dialog = builder.create();
+		
+		dialog.show();
 	}
 
 }

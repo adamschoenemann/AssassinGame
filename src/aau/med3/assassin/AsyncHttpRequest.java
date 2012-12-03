@@ -23,9 +23,8 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	public String protocol = "http";
 	public String domain;
 	public String encoding = "utf-8";
-	public DataListener listener;
+	public DataListener<String> listener;
 	public HashMap<String, String> params = new HashMap<String, String>();
-	
 	
 	protected String readStream(InputStream in){
 		BufferedReader reader = null;
@@ -73,12 +72,13 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 			
 			return ret;
 		} catch (MalformedURLException e) {
-
-			Log.d("DEBUG", e.toString());
-//			e.printStackTrace();
+			exception = e;
+			e.printStackTrace();
+			cancel(true);
 		} catch (IOException e) {
-
-			Log.d("DEBUG", e.toString());
+			exception = e;
+			e.printStackTrace();
+			cancel(true);
 		}
 		return "";
 	}
@@ -86,10 +86,15 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPostExecute(String result){
 		super.onPostExecute(result);
+		
 		if(listener != null){
-			listener.onDataComplete(result);
+			try {
+				listener.onDataComplete(result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-				
 		
 	}
 	
