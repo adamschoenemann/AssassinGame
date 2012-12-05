@@ -5,12 +5,31 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/btn_sign_in"
+        android:id="@+id/btn_log_in"
         android:layout_width="215dp"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_sign_up"
+        android:layout_below="@+id/btn_sign_up"
+        android:onClick="btn_log_in_onclick"
+        android:text="@string/btn_log_in" />
+
+    <Button
+        android:id="@+id/btn_user_info"
+        android:layout_width="215dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_log_in"
+        android:layout_below="@+id/btn_log_in"
+        android:onClick="btn_user_info_onclick"
+        android:text="@string/btn_user_info" />
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="215dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/btn_sign_in"
-        android:onClick="btn_sign_in_onclick" />
+        android:layout_marginTop="118dp"
+        android:onClick="btn_sign_up_onclick"
+        android:text="@string/btn_sign_up" />
 
 </RelativeLayout>

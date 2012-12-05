@@ -1,56 +1,54 @@
 package aau.med3.assassin.activities;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-public class GameActivity extends Activity {
+public class UserInfoActivity extends Activity {
 	
-	private static final int REQUEST_ENABLE_BT = 1;
-	public BluetoothAdapter btAdapter;
+	ListView listView;
+	ArrayAdapter<String> adapter;
+	ArrayList<String> items = new ArrayList<String>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_game);
+		setContentView(R.layout.activity_user_info);
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
+		listView = (ListView) findViewById(R.id.list_user_info);
+		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, items);
+		listView.setAdapter(adapter);
 
-		// Bluetooth stuff
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
-		if(btAdapter != null){
-//			btAdapter.getAddress();
-			if(btAdapter.isEnabled() == false){
-				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			} else {
-				
-			}
-
-		} else {
-			// Device does not support bluetooth
-			Log.d(Globals.DEBUG, "Device does not support bluetooth");
+		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+		HashMap<String, ?> prefMap = (HashMap<String, ?>) prefs.getAll();
+		for (Map.Entry<String, ?> entry : prefMap.entrySet()){
+			String key = entry.getKey();
+			String val = entry.getValue().toString();
+			items.add(key + ": " + val);
 		}
 		
-		if(btAdapter.isEnabled() == false){
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		}
+		
+		adapter.notifyDataSetChanged();
+		
 	}
-	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_game, menu);
+		getMenuInflater().inflate(R.menu.activity_user_info, menu);
 		return true;
 	}
 

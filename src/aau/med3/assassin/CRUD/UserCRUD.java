@@ -11,7 +11,7 @@ import aau.med3.assassin.Globals;
 import aau.med3.assassin.ServerInfo;
 
 // TODO: Implement methods for reading and updating and deleting
-public class User implements DataListener<String> {
+public class UserCRUD implements DataListener<String> {
 	
 	private String _url = "user/";
 	public DataListener<JSONArray> listener;
@@ -37,8 +37,22 @@ public class User implements DataListener<String> {
 		JSONObject json;
 		try {
 			json = new JSONObject();
-//			json.put(DB.users.ID, ID);
 			json.put(DB.userCols.getString("ID"), ID);
+			req.params = json;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		req.execute("");
+	}
+	
+	public void read(String email){
+		AsyncHttpRequest req = setupRequest("read");
+		JSONObject json;
+		try {
+			json = new JSONObject();
+			json.put(DB.userCols.getString("email"), email);
 			req.params = json;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

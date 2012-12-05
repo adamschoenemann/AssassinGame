@@ -1,26 +1,37 @@
 package aau.med3.assassin.activities;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import aau.med3.assassin.AssassinGame;
+import aau.med3.assassin.DataListener;
+import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
-import aau.med3.assassin.R.id;
-import aau.med3.assassin.R.layout;
-import aau.med3.assassin.R.menu;
-import aau.med3.assassin.R.string;
+import aau.med3.assassin.SimpleSHA1;
+import aau.med3.assassin.CRUD.UserCRUD;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -42,7 +53,7 @@ public class LoginActivity extends Activity {
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
-	private UserLoginTask mAuthTask = null;
+	private UserCRUD userCRUD = null;
 
 	// Values for email and password at the time of the login attempt.
 	private String mEmail;
@@ -137,7 +148,7 @@ public class LoginActivity extends Activity {
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
-		if (mAuthTask != null) {
+		if (userCRUD != null) {
 			return;
 		}
 
@@ -183,11 +194,74 @@ public class LoginActivity extends Activity {
 			// perform the user login attempt.
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
-			mAuthTask = new UserLoginTask();
-			mAuthTask.execute((Void) null);
+			userCRUD = new UserCRUD();
+			userCRUD.listener = new UserDataListener();
+			userCRUD.read(mEmail);
 		}
 	}
+	
+	public void showDialog(String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+		builder.setTitle("User Login")
+			.setMessage(msg)
+			.setCancelable(false)
+			.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int id){
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog dialog = builder.create();
+		
+		dialog.show();
+	}
+	
+	public class UserDataListener implements DataListener<JSONArray>{
 
+		@Override
+		public void onDataComplete(JSONArray data) {
+			try {
+				
+				if(data.length() > 0){
+					JSONObject json = data.getJSONObject(0);
+					Log.d(Globals.DEBUG, "JSON: " + json.toString());
+					Log.d(Globals.DEBUG, "User with valid email found");
+					if(json.getString("email").equals(mEmail)){
+						Log.d(Globals.DEBUG, "Email is correct");
+						if(json.getString("password").equals(SimpleSHA1.SHA1(mPassword))){
+							// User authenticated! Login!
+							AssassinGame app = (AssassinGame) getApplication();
+							app.login(json);
+							showDialog("User successfully logged in!");
+							Log.d(Globals.DEBUG, "User successfully logged in!");
+						} else {
+							Log.d(Globals.DEBUG, "Email: " + mEmail + " and password: " + mPassword + " dont match");
+							showDialog("Email and password don't match");
+						}
+							
+					}
+				} else {
+					showDialog("No user with email: " + mEmail);
+					Log.d(Globals.DEBUG, "No user with email: " + mEmail);
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			showProgress(false);
+			userCRUD = null;
+		}
+		
+	}
+	
 	/**
 	 * Shows the progress UI and hides the login form.
 	 */
@@ -238,13 +312,7 @@ public class LoginActivity extends Activity {
 		protected Boolean doInBackground(Void... params) {
 			// TODO: attempt authentication against a network service.
 
-			try {
-				// Simulate network access.
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				return false;
-			}
-
+			
 			for (String credential : DUMMY_CREDENTIALS) {
 				String[] pieces = credential.split(":");
 				if (pieces[0].equals(mEmail)) {
@@ -259,7 +327,7 @@ public class LoginActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
-			mAuthTask = null;
+			userCRUD = null;
 			showProgress(false);
 
 			if (success) {
@@ -273,7 +341,7 @@ public class LoginActivity extends Activity {
 
 		@Override
 		protected void onCancelled() {
-			mAuthTask = null;
+			userCRUD = null;
 			showProgress(false);
 		}
 	}

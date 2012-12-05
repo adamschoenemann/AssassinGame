@@ -2,12 +2,9 @@ package aau.med3.assassin.activities;
 
 
 import aau.med3.assassin.R;
-import aau.med3.assassin.R.layout;
-import aau.med3.assassin.R.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -28,9 +25,18 @@ public class MainActivity extends Activity {
         return true;
     }
     
-    public void btn_sign_in_onclick(View view){
+    public void btn_sign_up_onclick(View view){
     	Intent intent = new Intent(this, SignUpActivity.class);
     	startActivity(intent);
     }
     
+    public void btn_log_in_onclick(View view){
+    	Intent intent = new Intent(this, LoginActivity.class);
+    	startActivity(intent);
+    }
+    
+    public void btn_user_info_onclick(View view){
+    	Intent intent = new Intent(this, UserInfoActivity.class);
+    	startActivity(intent);
+    }
 }

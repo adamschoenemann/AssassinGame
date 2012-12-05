@@ -7,15 +7,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import aau.med3.assassin.DB;
+import aau.med3.assassin.AssassinGame;
 import aau.med3.assassin.DataListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.CRUD.Phone;
-import aau.med3.assassin.CRUD.User;
+import aau.med3.assassin.CRUD.UserCRUD;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -105,13 +106,17 @@ public class SignUpActivity extends Activity {
 				}
 			}
 			
-			User usr = new User();
+			UserCRUD usr = new UserCRUD();
 			usr.listener = new UserDataHandler();
 			usr.create(usrData);
 			
 			Phone phone = new Phone();
 			JSONObject phoneData = new JSONObject();
-			phoneData.put("MAC", "02-43-77-21-45");
+			// Get BT MAC address
+			BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
+			String MAC = bta.getAddress();
+			
+			phoneData.put("MAC", MAC);
 			phone.listener = new PhoneDataHandler();
 			phone.create(phoneData);
 			
@@ -127,32 +132,15 @@ public class SignUpActivity extends Activity {
 	public class UserDataHandler implements DataListener<JSONArray>{
 		public void onDataComplete(JSONArray data){
 			
+			AssassinGame app = (AssassinGame) getApplication();
 			try {
-				
-				JSONArray json = data;
-				JSONObject obj = json.getJSONObject(0);
-				Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
-				SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
-				
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt(DB.users.ID, obj.getInt("ID"));
-				editor.putString(DB.users.email, obj.getString("email"));
-				editor.putInt(DB.users.alive, obj.getInt("alive"));
-				editor.putString(DB.users.education, obj.getString("education"));
-				editor.putString(DB.users.password, obj.getString("password"));
-				editor.putInt(DB.users.target_ID, obj.getInt("target_ID"));
-				editor.putString(DB.users.phone_ID, obj.getString("phone_ID"));
-				editor.putInt(DB.users.points, obj.getInt("points"));
-				
-				
-				editor.commit();
-				Log.d(Globals.DEBUG, "[0]: " + json.getJSONObject(0).toString());
-				
-				
+				app.login(data.getJSONObject(0));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			
 			// Display Success Alert
 			AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
 			builder.setTitle("User Registration")
