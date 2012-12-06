@@ -13,7 +13,9 @@ public class DB {
 									alive = "alive",
 									target_ID = "target_ID",
 									points = "points",
-									education = "education";
+									education = "education",
+									MAC = "MAC";
+		
 		
 	}
 	public static final class phones {

@@ -106,16 +106,25 @@ public class SignUpActivity extends Activity {
 				}
 			}
 			
+			// Get BT MAC address
+			BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
+			String MAC; 
+			if(bta != null){
+				MAC = bta.getAddress();
+			} else {
+				Log.d(Globals.DEBUG, "No bluetooth adapter found");
+				MAC = "00-00-00-00-00-00";
+			}
+			
+			usrData.put("MAC", MAC);
+			
 			UserCRUD usr = new UserCRUD();
 			usr.listener = new UserDataHandler();
 			usr.create(usrData);
 			
 			Phone phone = new Phone();
 			JSONObject phoneData = new JSONObject();
-			// Get BT MAC address
-			BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
-			String MAC = bta.getAddress();
-			
+						
 			phoneData.put("MAC", MAC);
 			phone.listener = new PhoneDataHandler();
 			phone.create(phoneData);

@@ -1,10 +1,10 @@
 package aau.med3.assassin;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -17,7 +17,9 @@ public class AssassinGame extends Application {
 		Log.d(Globals.DEBUG, "Game started!");
 		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 		Integer ID = prefs.getInt("ID", 0);
-		Log.d(Globals.DEBUG, "I HAS STARTEEED!!!!!");
+		if(ID != null && (ID.equals("") == false)){
+			startAssassinService();
+		}
 		Log.d(Globals.DEBUG, "User_ID: " + ID.toString());
 		
 		try {
@@ -45,16 +47,23 @@ public class AssassinGame extends Application {
 			editor.putInt(DB.users.target_ID, obj.getInt("target_ID"));
 			editor.putString(DB.users.phone_ID, obj.getString("phone_ID"));
 			editor.putInt(DB.users.points, obj.getInt("points"));
+			editor.putString(DB.users.MAC, obj.getString("MAC"));
 			
 			
 			editor.commit();
 			Log.d(Globals.DEBUG, "Logged in with: " + obj.toString());
 			
+			// Start assassin service
+			startAssassinService();
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
+	
+	public void startAssassinService(){
+		Intent serviceIntent = new Intent(AssassinService.class.getName());
+		startService(serviceIntent);
+	}
 }

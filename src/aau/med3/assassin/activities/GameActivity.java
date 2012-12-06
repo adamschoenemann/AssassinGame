@@ -14,6 +14,7 @@ import android.view.MenuItem;
 public class GameActivity extends Activity {
 	
 	private static final int REQUEST_ENABLE_BT = 1;
+	private static final int REQUEST_ENABLE_DISCOVERABILITY = 2;
 	public BluetoothAdapter btAdapter;
 	
 	@Override
@@ -27,26 +28,35 @@ public class GameActivity extends Activity {
 		// Bluetooth stuff
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		if(btAdapter != null){
-//			btAdapter.getAddress();
+
 			if(btAdapter.isEnabled() == false){
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			} else {
-				
 			}
+			// Enable discoverability
+			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+			discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+			startActivityForResult(discoverableIntent, REQUEST_ENABLE_DISCOVERABILITY);
 
 		} else {
 			// Device does not support bluetooth
 			Log.d(Globals.DEBUG, "Device does not support bluetooth");
 		}
-		
-		if(btAdapter.isEnabled() == false){
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		switch(requestCode){
+			case REQUEST_ENABLE_BT:
+				
+				break;
+			case REQUEST_ENABLE_DISCOVERABILITY:
+				
+				break;
 		}
 	}
 	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
