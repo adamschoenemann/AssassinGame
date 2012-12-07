@@ -32,4 +32,13 @@
         android:onClick="btn_sign_up_onclick"
         android:text="@string/btn_sign_up" />
 
+    <Button
+        android:id="@+id/btn_game"
+        android:layout_width="215dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_user_info"
+        android:layout_below="@+id/btn_user_info"
+        android:onClick="btn_game_onclick"
+        android:text="To Game" />
+
 </RelativeLayout>

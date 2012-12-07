@@ -22,7 +22,7 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	public String protocol = "http";
 	public String domain;
 	public String encoding = "utf-8";
-	public DataListener<String> listener;
+	public EventListener<String> onExecutedListener;
 	public JSONObject params;
 //	public HashMap<String, String> params = new HashMap<String, String>();
 	
@@ -91,14 +91,20 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> {
 	protected void onPostExecute(String result){
 		super.onPostExecute(result);
 		
-		if(listener != null){
+		if(onExecutedListener != null){
 			try {
-				listener.onDataComplete(result);
+				onExecutedListener.onEvent(result);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		
+	}
+	
+	@Override
+	protected void onCancelled(String result){
+		super.onCancelled();
 		
 	}
 	

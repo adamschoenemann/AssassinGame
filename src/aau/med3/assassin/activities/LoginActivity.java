@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.AssassinGame;
-import aau.med3.assassin.DataListener;
+import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
@@ -76,7 +76,7 @@ public class LoginActivity extends Activity {
 		// Set up the login form.
 		mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
 		mEmailView = (EditText) findViewById(R.id.email);
-		mEmailView.setText(mEmail);
+//		mEmailView.setText(mEmail);
 
 		mPasswordView = (EditText) findViewById(R.id.password);
 		mPasswordView
@@ -195,7 +195,7 @@ public class LoginActivity extends Activity {
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
 			userCRUD = new UserCRUD();
-			userCRUD.listener = new UserDataListener();
+			userCRUD.onResponseListener = new UserDataListener();
 			userCRUD.read(mEmail);
 		}
 	}
@@ -217,10 +217,10 @@ public class LoginActivity extends Activity {
 		dialog.show();
 	}
 	
-	public class UserDataListener implements DataListener<JSONArray>{
+	public class UserDataListener implements EventListener<JSONArray>{
 
 		@Override
-		public void onDataComplete(JSONArray data) {
+		public void onEvent(JSONArray data) {
 			try {
 				
 				if(data.length() > 0){

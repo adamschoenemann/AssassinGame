@@ -6,17 +6,17 @@ import org.json.JSONObject;
 
 import aau.med3.assassin.AsyncHttpRequest;
 import aau.med3.assassin.DB;
-import aau.med3.assassin.DataListener;
+import aau.med3.assassin.EventListener;
 import aau.med3.assassin.ServerInfo;
 
-public class Phone implements DataListener<String> {
+public class Phone implements EventListener<String> {
 	private String _url = "phone/";
-	public DataListener<JSONArray> listener;
+	public EventListener<JSONArray> listener;
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
 		req.domain = ServerInfo.LOCATION + _url + str;		
-		req.listener = this;
+		req.onExecutedListener = this;
 		return req;
 	}
 	
@@ -56,10 +56,10 @@ public class Phone implements DataListener<String> {
 	}
 
 	@Override
-	public void onDataComplete(String data){
+	public void onEvent(String data){
 		try {
 			JSONArray json = new JSONArray(data.toString());
-			if(listener != null) listener.onDataComplete(json);
+			if(listener != null) listener.onEvent(json);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

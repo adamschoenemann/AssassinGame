@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.AssassinGame;
-import aau.med3.assassin.DataListener;
+import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
@@ -119,7 +119,7 @@ public class SignUpActivity extends Activity {
 			usrData.put("MAC", MAC);
 			
 			UserCRUD usr = new UserCRUD();
-			usr.listener = new UserDataHandler();
+			usr.onResponseListener = new UserDataHandler();
 			usr.create(usrData);
 			
 			Phone phone = new Phone();
@@ -138,8 +138,8 @@ public class SignUpActivity extends Activity {
 				
 	}
 	
-	public class UserDataHandler implements DataListener<JSONArray>{
-		public void onDataComplete(JSONArray data){
+	public class UserDataHandler implements EventListener<JSONArray>{
+		public void onEvent(JSONArray data){
 			
 			AssassinGame app = (AssassinGame) getApplication();
 			try {
@@ -168,9 +168,9 @@ public class SignUpActivity extends Activity {
 		}
 	}
 	
-	public class PhoneDataHandler implements DataListener<JSONArray>{
+	public class PhoneDataHandler implements EventListener<JSONArray>{
 		@Override
-		public void onDataComplete(JSONArray data) {
+		public void onEvent(JSONArray data) {
 			try {
 				SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 				SharedPreferences.Editor editor = prefs.edit();

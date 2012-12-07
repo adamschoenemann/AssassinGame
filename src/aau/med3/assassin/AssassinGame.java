@@ -15,9 +15,14 @@ public class AssassinGame extends Application {
 	@Override
 	public void onCreate(){
 		Log.d(Globals.DEBUG, "Game started!");
+		// Check if user data is saved
 		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 		Integer ID = prefs.getInt("ID", 0);
-		if(ID != null && (ID.equals("") == false)){
+		
+		// If it is, initialize user and start assassin service
+		if(ID != null && (ID.equals(0) == false)){
+			Globals.user = new User(getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE));
+			Globals.user.load();
 			startAssassinService();
 		}
 		Log.d(Globals.DEBUG, "User_ID: " + ID.toString());
@@ -31,39 +36,19 @@ public class AssassinGame extends Application {
 	}
 	
 	public void login(JSONObject userData){
-		try {
+
 			
-			
-			JSONObject obj = userData;
-			Log.d(Globals.DEBUG, "ID is: " +  obj.getString("ID"));
-			SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
-			
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.putInt(DB.users.ID, obj.getInt("ID"));
-			editor.putString(DB.users.email, obj.getString("email"));
-			editor.putInt(DB.users.alive, obj.getInt("alive"));
-			editor.putString(DB.users.education, obj.getString("education"));
-			editor.putString(DB.users.password, obj.getString("password"));
-			editor.putInt(DB.users.target_ID, obj.getInt("target_ID"));
-			editor.putString(DB.users.phone_ID, obj.getString("phone_ID"));
-			editor.putInt(DB.users.points, obj.getInt("points"));
-			editor.putString(DB.users.MAC, obj.getString("MAC"));
-			
-			
-			editor.commit();
-			Log.d(Globals.DEBUG, "Logged in with: " + obj.toString());
-			
-			// Start assassin service
-			startAssassinService();
-			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Globals.user = new User(getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE));
+		Globals.user.fromJSON(userData);
+		Globals.user.save();
+		// Start assassin service
+		startAssassinService();
+
 	}
 	
 	public void startAssassinService(){
 		Intent serviceIntent = new Intent(AssassinService.class.getName());
 		startService(serviceIntent);
 	}
+	
 }

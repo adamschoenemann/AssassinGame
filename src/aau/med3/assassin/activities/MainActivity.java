@@ -39,4 +39,9 @@ public class MainActivity extends Activity {
     	Intent intent = new Intent(this, UserInfoActivity.class);
     	startActivity(intent);
     }
+    
+    public void btn_game_onclick(View view){
+    	Intent intent = new Intent(this, GameActivity.class);
+    	startActivity(intent);
+    }
 }

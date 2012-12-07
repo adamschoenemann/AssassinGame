@@ -4,7 +4,7 @@
     android:versionName="1.1" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="10"
         android:targetSdkVersion="17" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -65,7 +65,7 @@
         </activity>
         <service 
            android:name=".AssassinService"
-           android:process=":remote" >
+            >
             <intent-filter>
                 <action android:name="aau.med3.assassin.AssassinService"/>
             </intent-filter>            
