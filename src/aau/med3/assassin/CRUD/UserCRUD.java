@@ -25,6 +25,7 @@ public class UserCRUD extends EventDispatcher {
 		req.domain = ServerInfo.LOCATION + _url + str;		
 		
 		req.addEventListener(Event.SUCCESS, new RequestSuccessHandler());
+		req.addEventListener(Event.FAILURE, new RequestFailedHandler());
 		return req;
 	}
 	
@@ -121,6 +122,16 @@ public class UserCRUD extends EventDispatcher {
 				e1.printStackTrace();
 			}
 			Log.d(Globals.DEBUG, "Event " + e.name + "dispatched. Data: " + result);
+		}
+		
+	}
+	
+	private class RequestFailedHandler implements EventListener {
+
+		@Override
+		public void handle(Event e) {
+			UserCRUD.this.dispatchEvent(Event.FAILURE, null);
+			
 		}
 		
 	}

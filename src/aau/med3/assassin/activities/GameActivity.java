@@ -116,6 +116,11 @@ public class GameActivity extends Activity {
 	}
 	
 	public void btn_kill_onclick(View view){
+//		if(Globals.featureDependencies.isAllEnabled() == false){
+//			Intent intent = new Intent(this, FeaturesActivity.class);
+//			startActivity(intent);
+//		}
+		
 		scanner.register();
 		if(Globals.assassinService.scanner.isScanning()){
 			
@@ -139,7 +144,7 @@ public class GameActivity extends Activity {
 
 		@Override
 		public void onEvent(BluetoothDevice device) {
-			String deviceMAC = device.getAddress().replace(':', '-');
+			String deviceMAC = device.getAddress();
 			if(deviceMAC.equals(Globals.user.target_MAC)){
 				Log.d(TAG, "GameActivity found target. Kill should be initialized");
 				
@@ -177,7 +182,7 @@ public class GameActivity extends Activity {
 
 		@Override
 		public void onEvent(BluetoothDevice device) {
-			String deviceMAC = device.getAddress().replace(':', '-');
+			String deviceMAC = device.getAddress();
 			if(deviceMAC.equals(Globals.user.target_MAC)){
 				Log.d(TAG, "GameActivity found target. Kill should be initialized");
 				
@@ -204,7 +209,7 @@ public class GameActivity extends Activity {
 		@Override
 		public void onEvent(BluetoothDevice device) {
 			
-			String deviceMAC = device.getAddress().replace(':', '-');
+			String deviceMAC = device.getAddress();
 			if(deviceMAC.equals(Globals.user.target_MAC)){
 				
 				Log.d(TAG, "Target device disconnected during kill process");
@@ -274,6 +279,7 @@ public class GameActivity extends Activity {
 	
 	@Override
 	protected void onStop(){
+		super.onStop();
 		// TODO: Clean up
 		// Maybe we should be in onPause
 		// Means that we should set up stuff in onResume

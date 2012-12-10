@@ -1,10 +1,14 @@
 package aau.med3.assassin.activities;
 
 
+import com.google.android.gcm.GCMRegistrar;
+
+import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -14,7 +18,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-                
+        GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkManifest(this);
+        final String regId = GCMRegistrar.getRegistrationId(this);
+        if(regId.equals("")){
+        	GCMRegistrar.register(this, Globals.SENDER_ID);
+        } else {
+        	Log.d(Globals.DEBUG, "Already registered");
+        }
         setContentView(R.layout.activity_main);
     }
 

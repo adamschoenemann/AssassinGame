@@ -1,14 +1,19 @@
 package aau.med3.assassin;
 
+import aau.med3.assassin.activities.GameActivity;
 import aau.med3.assassin.events.BluetoothEvent;
 import aau.med3.assassin.events.EventDispatcher;
 import aau.med3.assassin.events.EventHandler;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 // TODO: Change from eventhandler system to proper eventlistener
@@ -77,9 +82,12 @@ public class BluetoothScanner extends EventDispatcher {
 	}
 		
 	public void scan(){
+		
+		
 		if(!bta.isDiscovering()){
 			bta.startDiscovery();
 		}
+		
 	}
 	
 	public void stopScan(){

@@ -22,13 +22,13 @@ public class EventDispatcher implements IEventDispatcher {
 			 listeners.add(listener);
 			 events.put(name, listeners);
 		}
-		Log.d(TAG, "addEventListener called");
+//		Log.d(TAG, "addEventListener called");
 	}
 	
 	public void dispatchEvent(String name, Object data){
 		
 		if(events.containsKey(name) == false){
-			Log.d(TAG, "dispatchEvent called but not event with name " + name + " found");
+//			Log.d(TAG, "dispatchEvent called but not event with name " + name + " found");
 			return;
 		}
 		
@@ -39,7 +39,7 @@ public class EventDispatcher implements IEventDispatcher {
 		
 		List<EventListener> listeners = events.get(name);
 		for(EventListener listener : listeners){
-			Log.d(TAG, "dispatchEvent called with event: " + name);
+//			Log.d(TAG, "dispatchEvent called with event: " + name);
 			listener.handle(event);
 		}
 		
@@ -47,7 +47,7 @@ public class EventDispatcher implements IEventDispatcher {
 	
 	public void removeEventListeners(String name){
 		events.remove(name);
-		Log.d(TAG, "removeEventListeners called");
+//		Log.d(TAG, "removeEventListeners called");
 	}
 	
 	public void removeEventListener(String name, EventListener listenerAddress){
@@ -62,7 +62,7 @@ public class EventDispatcher implements IEventDispatcher {
 			}
 			index++;
 		}
-		Log.d(TAG, "removeEventListener called");
+//		Log.d(TAG, "removeEventListener called");
 	}
 	
 }

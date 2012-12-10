@@ -18,7 +18,7 @@ public class AssassinGame extends Application {
 		// Check if user data is saved
 		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 		Integer ID = prefs.getInt("ID", 0);
-		
+//		
 		// If it is, initialize user and start assassin service
 		if(ID != null && (ID.equals(0) == false)){
 			Globals.user = new User(getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE));
@@ -47,6 +47,7 @@ public class AssassinGame extends Application {
 	}
 	
 	public void startAssassinService(){
+		Log.d(Globals.DEBUG, "Attempting to start AssassinService");
 		Intent serviceIntent = new Intent(AssassinService.class.getName());
 		startService(serviceIntent);
 	}

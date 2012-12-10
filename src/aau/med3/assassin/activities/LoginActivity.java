@@ -13,7 +13,6 @@ import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.CRUD.UserCRUD;
 import aau.med3.assassin.events.Event;
-import aau.med3.assassin.events.EventHandler;
 import aau.med3.assassin.events.EventListener;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -21,7 +20,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -197,7 +195,7 @@ public class LoginActivity extends Activity {
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
 			userCRUD = new UserCRUD();
-			userCRUD.addEventListener(Event.SUCCESS, new UserDataListener());
+			userCRUD.addEventListener(Event.SUCCESS, new RequestSuccessHandler());
 			userCRUD.read(mEmail);
 		}
 	}
@@ -219,7 +217,7 @@ public class LoginActivity extends Activity {
 		dialog.show();
 	}
 	
-	public class UserDataListener implements EventListener {
+	public class RequestSuccessHandler implements EventListener {
 
 		@Override
 		public void handle(Event evt){
@@ -260,6 +258,16 @@ public class LoginActivity extends Activity {
 			}
 			showProgress(false);
 			userCRUD = null;
+		}
+		
+	}
+	
+	private class RequestFailedHandler implements EventListener {
+
+		@Override
+		public void handle(Event e) {
+			showDialog("Login attempt failed");
+			
 		}
 		
 	}
@@ -305,46 +313,4 @@ public class LoginActivity extends Activity {
 		}
 	}
 
-	/**
-	 * Represents an asynchronous login/registration task used to authenticate
-	 * the user.
-	 */
-	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			// TODO: attempt authentication against a network service.
-
-			
-			for (String credential : DUMMY_CREDENTIALS) {
-				String[] pieces = credential.split(":");
-				if (pieces[0].equals(mEmail)) {
-					// Account exists, return true if the password matches.
-					return pieces[1].equals(mPassword);
-				}
-			}
-
-			// TODO: register the new account here.
-			return true;
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {
-			userCRUD = null;
-			showProgress(false);
-
-			if (success) {
-				finish();
-			} else {
-				mPasswordView
-						.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			userCRUD = null;
-			showProgress(false);
-		}
-	}
 }

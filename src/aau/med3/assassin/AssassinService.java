@@ -5,16 +5,18 @@ import java.util.TimerTask;
 
 import aau.med3.assassin.activities.GameActivity;
 import aau.med3.assassin.events.EventHandler;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -26,6 +28,8 @@ public class AssassinService extends Service {
 	private final static Integer REQUEST_ENABLE_BT = 1;
 	
 	public BluetoothScanner scanner;
+	public BluetoothAdapter bta;
+	
 	private Timer timer;
 	private final Integer INTERVAL = 20;
 	private final Integer notID = 12;
@@ -34,6 +38,10 @@ public class AssassinService extends Service {
 	private class UpdateTask extends TimerTask {
 		@Override
 		public void run(){
+			if(!isConnected()){
+				Log.d(TAG, "Connectivity not enabled");
+				return;
+			}
 			if(scanner != null){
 				if(!scanner.isScanning())
 					scanner.scan();
@@ -43,13 +51,14 @@ public class AssassinService extends Service {
 		}
 	};
 	
-	private void createNotification(){
+	private void createNotification(String title, String content, Intent resultIntent){
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+		.setDefaults(Notification.DEFAULT_VIBRATE)
 		.setSmallIcon(R.drawable.ic_launcher)
-		.setContentTitle("Target detected!")
-		.setContentText("Your target was detected in the area!");
+		.setContentTitle(title)
+		.setContentText(content);
 		
-		Intent resultIntent = new Intent(this, GameActivity.class);
+		
 		
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 		stackBuilder.addParentStack(GameActivity.class);
@@ -66,19 +75,8 @@ public class AssassinService extends Service {
 	public void onCreate(){
 		super.onCreate();
 				
-		BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
-		if(bta != null){
-			if(!bta.isEnabled()){
-				Log.d(TAG, "Bluetooth not enabled, trying to enable");
-				bta.enable();
-			}
-			
-			
-		} else {
-			Log.d(TAG, "No bluetooth adapter on device!");
-		}
-		
-		
+		bta = BluetoothAdapter.getDefaultAdapter();
+
 		scanner = new BluetoothScanner(this, bta);
 		scanner.onDeviceFound = new DeviceFoundHandler();
 		
@@ -89,7 +87,29 @@ public class AssassinService extends Service {
 		Log.d(TAG, "AssassinService created!");
 	}
 	
+	private Boolean isConnected(){
+		// Bluetooth
+		if(bta.isEnabled() == false || bta.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+			Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+			intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+			createNotification("Enable Bluetooth", "Please enable bluetooth to continue", intent);
+			return false;
+		}
+		ConnectivityManager cm = (ConnectivityManager) this.getSystemService(CONNECTIVITY_SERVICE);
+		NetworkInfo network = cm.getActiveNetworkInfo();
+		if(network == null || network.isConnected() == false){
+			Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+			
+			createNotification("Enable Connectivity", "Please enable internet connectivity to continue", intent);
+			return false;
+		} else {
+			
+			return true;
+		}
+	}
+	
 	public void startScanning(){
+		
 		timer = new Timer("UpdateTimer");
 		timer.schedule(new UpdateTask(), 100L, INTERVAL * 1000L);
 		Log.d(TAG, "Service is scanning");
@@ -133,11 +153,11 @@ public class AssassinService extends Service {
 		@Override
 		public void onEvent(BluetoothDevice device) {
 			
-			String deviceMAC = device.getAddress().replace(':', '-');
+			String deviceMAC = device.getAddress();
 			
 			Log.d(TAG, "target: " + Globals.user.target_MAC + ", device: " + deviceMAC);
 			if(deviceMAC.equals(Globals.user.target_MAC)){
-				createNotification();
+				createNotification("Target detected!", "Your target was detected in the area!", new Intent(AssassinService.this, GameActivity.class));
 				Log.d(TAG, "Target found!");
 //				scanner.stopScan();
 			}

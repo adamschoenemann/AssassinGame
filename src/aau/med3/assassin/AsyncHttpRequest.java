@@ -106,7 +106,7 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	@Override
 	protected void onCancelled(String result){
 		super.onCancelled();
-		
+		dispatchEvent(Event.FAILURE, null);
 	}
 
 	@Override

@@ -21,5 +21,6 @@
     <string name="title_activity_game">GameActivity</string>
     <string name="btn_user_info">User Info</string>
     <string name="title_activity_user_info">UserInfoActivity</string>
+    <string name="title_activity_features">FeaturesActivity</string>
 
 </resources>
