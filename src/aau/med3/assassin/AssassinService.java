@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import aau.med3.assassin.activities.GameActivity;
+import aau.med3.assassin.events.EventHandler;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -18,44 +19,24 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-// TODO: Use BluetoothScanner instead
+
 public class AssassinService extends Service {
 	
 	private final static String TAG = "ASSASSIN_SERVICE";
 	private final static Integer REQUEST_ENABLE_BT = 1;
-	private BluetoothAdapter bta;
+	
+	public BluetoothScanner scanner;
 	private Timer timer;
 	private final Integer INTERVAL = 20;
 	private final Integer notID = 12;
 	
-	// BroadcastReceiver for ACTION_FOUND
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {				
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			Log.d(TAG, action + " broadcast received");
-			if(BluetoothDevice.ACTION_FOUND.equals(action)){
-				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				String name = device.getName();
-				String MAC = device.getAddress().replace(':', '-');
-				User user = Globals.user;
-				Log.d(TAG, "target: " + user.target_MAC + ", device: " + MAC);
-				if(user.target_MAC.equals(MAC)){
-//					user.kill(MAC);
-					createNotification();
-					Log.d(TAG, "Target found!");
-				}
-				Log.d(TAG, "Device found: " + name + ", MAC: " + MAC);
-			}
-			
-		}
-	};
-	
-	private TimerTask updateTask = new TimerTask(){
+		
+	private class UpdateTask extends TimerTask {
 		@Override
 		public void run(){
-			if(bta != null){
-				bta.startDiscovery();
+			if(scanner != null){
+				if(!scanner.isScanning())
+					scanner.scan();
 			}
 			
 			Log.d(TAG, "timer doing work");
@@ -84,9 +65,8 @@ public class AssassinService extends Service {
 	@Override
 	public void onCreate(){
 		super.onCreate();
-		
-		
-		bta = BluetoothAdapter.getDefaultAdapter();
+				
+		BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
 		if(bta != null){
 			if(!bta.isEnabled()){
 				Log.d(TAG, "Bluetooth not enabled, trying to enable");
@@ -98,22 +78,34 @@ public class AssassinService extends Service {
 			Log.d(TAG, "No bluetooth adapter on device!");
 		}
 		
-
-		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-		registerReceiver(receiver, filter);
 		
-		timer = new Timer("UpdateTimer");
+		scanner = new BluetoothScanner(this, bta);
+		scanner.onDeviceFound = new DeviceFoundHandler();
 		
+		
+		Globals.assassinService = this;
+		
+		startScanning();
 		Log.d(TAG, "AssassinService created!");
 	}
 	
 	public void startScanning(){
-		timer.schedule(updateTask, 100L, INTERVAL * 1000L);
+		timer = new Timer("UpdateTimer");
+		timer.schedule(new UpdateTask(), 100L, INTERVAL * 1000L);
+		Log.d(TAG, "Service is scanning");
+		scanner.register();
+		
 	}
 	
 	public void stopScanning(){
-		timer.cancel();
-		timer.purge();
+		if(timer != null){
+			timer.cancel();
+			timer.purge();
+			timer = null;
+		}
+		scanner.stopScan();
+		scanner.unregister();
+		Log.d(TAG, "Service scanning paused");
 	}
 	
 	@Override
@@ -121,14 +113,37 @@ public class AssassinService extends Service {
 		super.onDestroy();
 		timer.cancel();
 		timer = null;
-		unregisterReceiver(receiver);
-		if(bta != null){
-			bta.disable();
+		
+		if(scanner != null){
+			if(scanner.isScanning()){
+				scanner.stopScan();
+			}
+			scanner.getAdapter().disable();
+			scanner.unregister();
+			scanner = null;
 		}
 		if(Globals.user != null){
 			Globals.user.save();
 		}
 		Log.d(TAG, "AssassinService destroyed!");
+	}
+	
+	private class DeviceFoundHandler implements EventHandler<BluetoothDevice>{
+
+		@Override
+		public void onEvent(BluetoothDevice device) {
+			
+			String deviceMAC = device.getAddress().replace(':', '-');
+			
+			Log.d(TAG, "target: " + Globals.user.target_MAC + ", device: " + deviceMAC);
+			if(deviceMAC.equals(Globals.user.target_MAC)){
+				createNotification();
+				Log.d(TAG, "Target found!");
+//				scanner.stopScan();
+			}
+			
+		}
+		
 	}
 	
 	@Override

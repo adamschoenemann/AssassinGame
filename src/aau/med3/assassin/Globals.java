@@ -5,4 +5,5 @@ public class Globals {
 	public final static String PREF_FILENAME = "AssassinPrefs";
 	public final static String DEBUG = "DEBUG";
 	public static User user;
+	public static AssassinService assassinService;
 }

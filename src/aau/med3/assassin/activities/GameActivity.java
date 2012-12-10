@@ -3,10 +3,11 @@ package aau.med3.assassin.activities;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import aau.med3.assassin.AssassinService;
 import aau.med3.assassin.BluetoothScanner;
-import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
+import aau.med3.assassin.events.EventHandler;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -25,30 +26,33 @@ import android.widget.Toast;
 // TODO: Implement distance checking
 public class GameActivity extends Activity {
 	
+	private View statusView;
+	private View actionView;
+	
 	private static final int REQUEST_ENABLE_BT = 1;
 	private static final int REQUEST_ENABLE_DISCOVERABILITY = 2;
+	public final static String TAG = "GAME_ACTIVITY";
 	
-	private Boolean initialScanSuccess,
-					finalScanSuccess;
-	
-	private Boolean killInProgress = false;
-	
+
 	private final long KILL_DURATION = 8000;
+	
 	private Timer timer;
-	private final TimerTask timerTask = new TimerTask(){
+		
+	private BluetoothAdapter bta;
+	private BluetoothScanner scanner;
+	
+	private class KillTask extends TimerTask {
 
 		@Override
 		public void run() {
-			if(killInProgress == true){
-				scanner.scan();
-			}
-			Log.d(Globals.DEBUG, String.valueOf(KILL_DURATION) + " ms passed");
+			scanner.onDeviceDisconnected = null;
+			scanner.onDeviceFound = new FinalDeviceFoundHandler();
+			scanner.onScanFinished = new UnsuccesfulScanHandler();
+			scanner.scan();
+			Log.d(TAG, String.valueOf(KILL_DURATION) + " ms passed");
 		}
 		
 	};
-	
-	private BluetoothAdapter bta;
-	private BluetoothScanner scanner;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,10 @@ public class GameActivity extends Activity {
 		setContentView(R.layout.activity_game);
 		// Show the Up button in the action bar.
 		setupActionBar();
-
+		
+		statusView = findViewById(R.id.kill_status);
+		actionView = findViewById(R.id.kill_layout);
+		
 		// Bluetooth setup
 		bta = BluetoothAdapter.getDefaultAdapter();
 		if(bta != null){
@@ -73,92 +80,196 @@ public class GameActivity extends Activity {
 			}
 			
 			scanner = new BluetoothScanner(this, bta);
-			scanner.onDeviceFound = new DeviceFoundHandler();
-			scanner.onScanFinished = new ScanFinishedHandler();
+			
+			
 			
 		} else {
 			// Device does not support bluetooth
-			Log.d(Globals.DEBUG, "Device does not support bluetooth");
+			Log.d(TAG, "Device does not support bluetooth");
 		}
 
 	}
 	
-	public void btn_kill_onclick(View view){
-		initialScanSuccess = false;
-		finalScanSuccess = false;
-		scanner.scan();
-		
+	@Override
+	protected void onResume(){
+		super.onResume();
+
+//		scanner.register();
 	}
 	
-	private class DeviceFoundHandler implements EventListener<BluetoothDevice> {
+	@Override
+	protected void onPause(){
+		super.onPause();
+
+//		scanner.unregister();
+	}
+	
+	private void initKill(){
+		
+		scanner.onDeviceFound = new InitialDeviceFoundHandler();
+		scanner.onScanFinished = new UnsuccesfulScanHandler();
+		
+		scanner.scan();
+		
+		statusView.setVisibility(View.VISIBLE);
+		actionView.setVisibility(View.GONE);
+	}
+	
+	public void btn_kill_onclick(View view){
+		scanner.register();
+		if(Globals.assassinService.scanner.isScanning()){
+			
+			scanner.onScanFinished = new EventHandler<Integer>() {
+				@Override
+				public void onEvent(Integer data) {
+					initKill();
+					
+				}				
+			};
+			Globals.assassinService.stopScanning();
+		} else {
+			Globals.assassinService.stopScanning();
+			initKill();
+		}
+		
+
+	}
+		
+	private class InitialDeviceFoundHandler implements EventHandler<BluetoothDevice>{
+
 		@Override
 		public void onEvent(BluetoothDevice device) {
 			String deviceMAC = device.getAddress().replace(':', '-');
 			if(deviceMAC.equals(Globals.user.target_MAC)){
-				if(initialScanSuccess == true && killInProgress == true){
-					finalScanSuccess = true;
-					scanner.stopScan();
-					Globals.user.kill(deviceMAC);
-					killSucessful();
-				}
-				if(initialScanSuccess == false){
-					initialScanSuccess = true;
-					scanner.stopScan();
-					killInProgress = true;
-					scanner.onDeviceDisconnected = new DeviceDisconnectedHandler();
-					timer = new Timer("KillTimer");
-					timer.schedule(timerTask, KILL_DURATION);
-				}
-			}
-			
-		}
-	}
-	
-	private class DeviceDisconnectedHandler implements EventListener<BluetoothDevice> {
-
-		@Override
-		public void onEvent(BluetoothDevice data) {
-			if(killInProgress == true){
-				abortKill();
+				Log.d(TAG, "GameActivity found target. Kill should be initialized");
+				
+				scanner.onDeviceFound = null;
+				scanner.onScanFinished = new InitialSuccesfulScanHandler();
+				scanner.stopScan();
 			}
 			
 		}
 		
 	}
 	
-	private class ScanFinishedHandler implements EventListener<Integer> {
+	private class InitialSuccesfulScanHandler implements EventHandler<Integer>{
 
 		@Override
 		public void onEvent(Integer data) {
-			if(initialScanSuccess == false){
-				abortKill();
-				return;
-			}
-			if(finalScanSuccess == false){
-				abortKill();
-				return;
+			scanner.onDeviceDisconnected = new DeviceDisconnectedHandler();
+			timer = new Timer("KillTimer");
+			timer.schedule(new KillTask(), KILL_DURATION);
+		}
+		
+	}
+	
+	private class UnsuccesfulScanHandler implements EventHandler<Integer>{
+
+		@Override
+		public void onEvent(Integer data) {
+			abortKill();
+			
+		}
+		
+	}
+	
+	private class FinalDeviceFoundHandler implements EventHandler<BluetoothDevice>{
+
+		@Override
+		public void onEvent(BluetoothDevice device) {
+			String deviceMAC = device.getAddress().replace(':', '-');
+			if(deviceMAC.equals(Globals.user.target_MAC)){
+				Log.d(TAG, "GameActivity found target. Kill should be initialized");
+				
+				scanner.onDeviceFound = null;
+				scanner.onScanFinished = new FinalSuccesfulScanHandler();
+				scanner.stopScan();
 			}
 			
 		}
 		
 	}
 	
-	public void abortKill(){
-		initialScanSuccess = false;
-		killInProgress = false;
-		finalScanSuccess = false;
-		if(timer != null) timer.cancel();
+	private class FinalSuccesfulScanHandler implements EventHandler<Integer>{
+
+		@Override
+		public void onEvent(Integer data) {
+			killSucessful();
+		}
 		
-		Log.d(Globals.DEBUG, "Kill failed!");
+	}
+	
+	private class DeviceDisconnectedHandler implements EventHandler<BluetoothDevice> {
+
+		@Override
+		public void onEvent(BluetoothDevice device) {
+			
+			String deviceMAC = device.getAddress().replace(':', '-');
+			if(deviceMAC.equals(Globals.user.target_MAC)){
+				
+				Log.d(TAG, "Target device disconnected during kill process");
+				abortKill();
+				
+			}
+			
+			
+		}
+		
+	}
+	
+	
+	public void abortKill(){
+		scanner.unregister();
+
+		if(timer != null){
+			timer.cancel();
+			timer.purge();
+			
+			timer = null;
+		}
+		
+		Log.d(TAG, "Kill failed!");
+		Thread.dumpStack();
+		
+		if(Globals.assassinService != null){
+			AssassinService service = Globals.assassinService;
+			service.startScanning();
+			
+		}
+		
+		statusView.setVisibility(View.GONE);
+		actionView.setVisibility(View.VISIBLE);
 		Toast.makeText(getApplicationContext(), "Kill failed!", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void killSucessful(){
+
+		Globals.user.kill(Globals.user.target_MAC);
+		scanner.unregister();
+
+		if(timer != null){
+			timer.cancel();
+			timer.purge();
+			
+			timer = null;
+		}
+		
+		Log.d(TAG, "Kill succesful!");
+		
 		Context context = getApplicationContext();
 		CharSequence text = "Kill succesful!";
+		
 		int duration = Toast.LENGTH_SHORT;
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
+		statusView.setVisibility(View.GONE);
+		actionView.setVisibility(View.VISIBLE);
+		
+		if(Globals.assassinService != null){
+			AssassinService service = Globals.assassinService;
+			service.startScanning();
+			
+		}
 	}
 	
 	@Override
@@ -180,6 +291,7 @@ public class GameActivity extends Activity {
 				break;
 		}
 	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

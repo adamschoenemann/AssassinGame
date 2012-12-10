@@ -8,11 +8,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.AssassinGame;
-import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.CRUD.UserCRUD;
+import aau.med3.assassin.events.Event;
+import aau.med3.assassin.events.EventHandler;
+import aau.med3.assassin.events.EventListener;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -195,7 +197,7 @@ public class LoginActivity extends Activity {
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
 			userCRUD = new UserCRUD();
-			userCRUD.onResponseListener = new UserDataListener();
+			userCRUD.addEventListener(Event.SUCCESS, new UserDataListener());
 			userCRUD.read(mEmail);
 		}
 	}
@@ -217,12 +219,12 @@ public class LoginActivity extends Activity {
 		dialog.show();
 	}
 	
-	public class UserDataListener implements EventListener<JSONArray>{
+	public class UserDataListener implements EventListener {
 
 		@Override
-		public void onEvent(JSONArray data) {
+		public void handle(Event evt){
 			try {
-				
+				JSONArray data = (JSONArray) evt.data;
 				if(data.length() > 0){
 					JSONObject json = data.getJSONObject(0);
 					Log.d(Globals.DEBUG, "JSON: " + json.toString());

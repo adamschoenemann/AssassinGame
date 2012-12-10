@@ -8,12 +8,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.AssassinGame;
-import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.CRUD.Phone;
 import aau.med3.assassin.CRUD.UserCRUD;
+import aau.med3.assassin.events.Event;
+import aau.med3.assassin.events.EventHandler;
+import aau.med3.assassin.events.EventListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -119,7 +121,7 @@ public class SignUpActivity extends Activity {
 			usrData.put("MAC", MAC);
 			
 			UserCRUD usr = new UserCRUD();
-			usr.onResponseListener = new UserDataHandler();
+			usr.addEventListener(Event.SUCCESS, new UserDataHandler());
 			usr.create(usrData);
 			
 			Phone phone = new Phone();
@@ -138,11 +140,12 @@ public class SignUpActivity extends Activity {
 				
 	}
 	
-	public class UserDataHandler implements EventListener<JSONArray>{
-		public void onEvent(JSONArray data){
+	public class UserDataHandler implements EventListener {
+		public void handle(Event evt){
 			
 			AssassinGame app = (AssassinGame) getApplication();
 			try {
+				JSONArray data = (JSONArray) evt.data;
 				app.login(data.getJSONObject(0));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -168,7 +171,7 @@ public class SignUpActivity extends Activity {
 		}
 	}
 	
-	public class PhoneDataHandler implements EventListener<JSONArray>{
+	public class PhoneDataHandler implements EventHandler<JSONArray>{
 		@Override
 		public void onEvent(JSONArray data) {
 			try {

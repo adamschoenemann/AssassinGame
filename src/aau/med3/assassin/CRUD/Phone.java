@@ -6,17 +6,17 @@ import org.json.JSONObject;
 
 import aau.med3.assassin.AsyncHttpRequest;
 import aau.med3.assassin.DB;
-import aau.med3.assassin.EventListener;
 import aau.med3.assassin.ServerInfo;
+import aau.med3.assassin.events.EventHandler;
 
-public class Phone implements EventListener<String> {
+public class Phone implements EventHandler<String> {
 	private String _url = "phone/";
-	public EventListener<JSONArray> listener;
+	public EventHandler<JSONArray> listener;
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
 		req.domain = ServerInfo.LOCATION + _url + str;		
-		req.onExecutedListener = this;
+		
 		return req;
 	}
 	

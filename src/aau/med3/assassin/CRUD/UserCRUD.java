@@ -6,20 +6,25 @@ import org.json.JSONObject;
 
 import aau.med3.assassin.AsyncHttpRequest;
 import aau.med3.assassin.DB;
-import aau.med3.assassin.EventListener;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.ServerInfo;
+import aau.med3.assassin.events.Event;
+import aau.med3.assassin.events.EventDispatcher;
+import aau.med3.assassin.events.EventHandler;
+import aau.med3.assassin.events.EventListener;
+import android.util.Log;
 
 // TODO: Implement methods for reading and updating and deleting
-public class UserCRUD implements EventListener<String> {
+public class UserCRUD extends EventDispatcher {
 	
 	private String _url = "user/";
-	public EventListener<JSONArray> onResponseListener;
+	
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
 		req.domain = ServerInfo.LOCATION + _url + str;		
-		req.onExecutedListener = this;
+		
+		req.addEventListener(Event.SUCCESS, new RequestSuccessHandler());
 		return req;
 	}
 	
@@ -103,15 +108,21 @@ public class UserCRUD implements EventListener<String> {
 		req.execute("");
 	}
 	
-	@Override
-	public void onEvent(String data){
-		try {
-			JSONArray json = new JSONArray(data.toString());
-			if(onResponseListener != null) onResponseListener.onEvent(json);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private class RequestSuccessHandler implements EventListener {
+
+		@Override
+		public void handle(Event e) {
+			String result = (String) e.data;
+			try {
+				JSONArray json = new JSONArray(result);
+				dispatchEvent(Event.SUCCESS, json);
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			Log.d(Globals.DEBUG, "Event " + e.name + "dispatched. Data: " + result);
 		}
 		
 	}
+
 }
