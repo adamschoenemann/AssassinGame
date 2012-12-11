@@ -18,14 +18,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(this);
-        if(regId.equals("")){
-        	GCMRegistrar.register(this, Globals.SENDER_ID);
-        } else {
-        	Log.d(Globals.DEBUG, "Already registered");
-        }
+        
         setContentView(R.layout.activity_main);
     }
 

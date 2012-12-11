@@ -18,7 +18,7 @@ import android.util.Log;
 public class UserCRUD extends EventDispatcher {
 	
 	private String _url = "user/";
-	
+	private final static String TAG = "UserCRUD";
 	
 	private AsyncHttpRequest setupRequest(String str){
 		AsyncHttpRequest req = new AsyncHttpRequest();
@@ -131,7 +131,7 @@ public class UserCRUD extends EventDispatcher {
 		@Override
 		public void handle(Event e) {
 			UserCRUD.this.dispatchEvent(Event.FAILURE, null);
-			
+			Log.d(TAG, "Request failed");
 		}
 		
 	}

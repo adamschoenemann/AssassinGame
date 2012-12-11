@@ -3,6 +3,8 @@ package aau.med3.assassin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,12 +39,26 @@ public class AssassinGame extends Application {
 	
 	public void login(JSONObject userData){
 
-			
+		try {	
 		Globals.user = new User(getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE));
 		Globals.user.fromJSON(userData);
 		Globals.user.save();
+		
+		GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkManifest(this);
+        final String regId = GCMRegistrar.getRegistrationId(this);
+        
+        if(regId.equals(userData.getString("regId")) == false){
+        	GCMRegistrar.register(this, Globals.SENDER_ID);
+        } else {
+        	Log.d(Globals.DEBUG, "Already registered");
+        }
+		
 		// Start assassin service
 		startAssassinService();
+		} catch (JSONException e){
+			e.printStackTrace();
+		}
 
 	}
 	

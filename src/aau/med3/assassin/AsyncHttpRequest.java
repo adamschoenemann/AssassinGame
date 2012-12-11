@@ -83,15 +83,15 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 		} catch (MalformedURLException e) {
 			exception = e;
 			e.printStackTrace();
-			cancel(true);
+			cancel(false);
 		} catch (IOException e) {
 			exception = e;
 			e.printStackTrace();
-			cancel(true);
+			cancel(false);
 		} catch (JSONException e) {
 			exception = e;
 			e.printStackTrace();
-			cancel(true);
+			cancel(false);
 		}
 		return "";
 	}
