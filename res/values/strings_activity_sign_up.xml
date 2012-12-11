@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="title_activity_sign_in">Sign Up</string>
+    
+
+    <string-array name="educations">
+        <item>Medialogy</item>
+		<item>Humanistisk Informatik</item>
+		<item>Tekno-Antropology</item>
+        <item>By Miljø og Energi</item>
+        <item>IT and Communication</item>
+        <item>Landinspektør</item>
+    </string-array>
+
+    <string name="signup_education_hint">Your Education</string>
+
+</resources>

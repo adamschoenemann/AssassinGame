@@ -4,8 +4,9 @@ public class Event {
 	
 	// Event constants
 	public final static String 	SUCCESS = "success",
-								FAILURE = "failure",
-								INTERRUPTED = "interrupted";
+									FAILURE = "failure",
+									INTERRUPTED = "interrupted",
+									STATE_CHANGED = "stateChanged";
 	
 	
 	

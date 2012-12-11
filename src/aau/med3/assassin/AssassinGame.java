@@ -32,7 +32,6 @@ public class AssassinGame extends Application {
 		try {
 			DB.userCols = new JSONObject("{\"ID\" : \"ID\", \"email\":\"email\", \"password\": \"password\", \"phone_ID\" : \"phone_ID\", \"target_ID\" : \"target_ID\", \"education\": \"education\" }");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

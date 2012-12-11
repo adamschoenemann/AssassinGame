@@ -11,7 +11,6 @@ import aau.med3.assassin.AssassinGame;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
-import aau.med3.assassin.CRUD.Phone;
 import aau.med3.assassin.CRUD.UserCRUD;
 import aau.med3.assassin.events.Event;
 import aau.med3.assassin.events.EventHandler;
@@ -72,7 +71,7 @@ public class SignUpActivity extends Activity {
 		JSONObject usrData;
 		try {
 			usrData = new JSONObject();
-			LinearLayout viewParent = (LinearLayout) findViewById(R.id.user_create_layout);
+			LinearLayout viewParent = (LinearLayout) findViewById(R.id.signup_layout);
 			int count = viewParent.getChildCount();
 			
 			// Collect form data
@@ -123,13 +122,7 @@ public class SignUpActivity extends Activity {
 			UserCRUD usr = new UserCRUD();
 			usr.addEventListener(Event.SUCCESS, new UserDataHandler());
 			usr.create(usrData);
-			
-			Phone phone = new Phone();
-			JSONObject phoneData = new JSONObject();
-						
-			phoneData.put("MAC", MAC);
-			phone.listener = new PhoneDataHandler();
-			phone.create(phoneData);
+
 			
 		} catch (JSONException e){
 			e.printStackTrace();

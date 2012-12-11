@@ -12,6 +12,7 @@ import android.util.Log;
 
 public class User {
 
+	private static final String TAG = "User";
 	public String email, MAC, target_MAC; 
 	public Integer ID, points;
 	public Boolean loggedIn;
@@ -60,6 +61,7 @@ public class User {
 			editor.putInt("ID", ID);
 			editor.putInt("points", points);
 			editor.commit();
+			Log.d(TAG, "User saved!");
 		}
 	}
 	

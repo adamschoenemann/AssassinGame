@@ -4,8 +4,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import aau.med3.assassin.activities.GameActivity;
+import aau.med3.assassin.events.Event;
+import aau.med3.assassin.events.EventDispatcher;
 import aau.med3.assassin.events.EventHandler;
-import android.app.Notification;
+import aau.med3.assassin.events.EventListener;
+import aau.med3.assassin.events.IEventDispatcher;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -22,32 +25,49 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 
-public class AssassinService extends Service {
+public class AssassinService extends Service implements IEventDispatcher {
 	
 	private final static String TAG = "ASSASSIN_SERVICE";
 	private final static Integer REQUEST_ENABLE_BT = 1;
 	
 	public BluetoothScanner scanner;
 	public BluetoothAdapter bta;
+	private EventDispatcher dispatcher = new EventDispatcher();
+	
+	private NotificationManager notMan;
 	
 	private Timer timer;
 	private final Integer INTERVAL = 20;
-	private final Integer notID = 12;
-	
+	private final static Integer NOTIFICATION_ID = 12;
+	public Boolean running = false;
 		
 	private class UpdateTask extends TimerTask {
 		@Override
 		public void run(){
 			if(!isConnected()){
-				Log.d(TAG, "Connectivity not enabled");
-				return;
+				
+				if(running){
+					
+					Log.d(TAG, "connectivity disabled");
+					running = false;
+					dispatchEvent(Event.STATE_CHANGED, false);
+				}
+				
 			}
-			if(scanner != null){
-				if(!scanner.isScanning())
-					scanner.scan();
+			else {
+				if(running == false){
+					notMan.cancel(NOTIFICATION_ID);
+					Log.d(TAG, "connectivity enabled");
+					running = true;
+					dispatchEvent(Event.STATE_CHANGED, true);
+				}
+				if(scanner != null){
+					if(!scanner.isScanning())
+						scanner.scan();
+				}
+				
+				Log.d(TAG, "timer doing work");
 			}
-			
-			Log.d(TAG, "timer doing work");
 		}
 	};
 	
@@ -67,8 +87,8 @@ public class AssassinService extends Service {
 		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 		builder.setContentIntent(resultPendingIntent);
 		
-		NotificationManager notMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		notMan.notify(notID, builder.build());
+		
+		notMan.notify(NOTIFICATION_ID, builder.build());
 	}
 	
 	@Override
@@ -76,7 +96,7 @@ public class AssassinService extends Service {
 		super.onCreate();
 				
 		bta = BluetoothAdapter.getDefaultAdapter();
-
+		notMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		scanner = new BluetoothScanner(this, bta);
 		scanner.onDeviceFound = new DeviceFoundHandler();
 		
@@ -87,26 +107,25 @@ public class AssassinService extends Service {
 		Log.d(TAG, "AssassinService created!");
 	}
 	
-	private Boolean isConnected(){
-		// Bluetooth
-		if(bta.isEnabled() == false || bta.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+	public Boolean isConnected(){
+		StateMachine state = new StateMachine(this);
+		if(state.isBTEnabled() == false || state.isBTDiscoverable() == false){
 			Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
 			createNotification("Enable Bluetooth", "Please enable bluetooth to continue", intent);
 			return false;
 		}
-		ConnectivityManager cm = (ConnectivityManager) this.getSystemService(CONNECTIVITY_SERVICE);
-		NetworkInfo network = cm.getActiveNetworkInfo();
-		if(network == null || network.isConnected() == false){
-			Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
 			
+		
+		if(!state.isNetworkConnected()){
+			Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
 			createNotification("Enable Connectivity", "Please enable internet connectivity to continue", intent);
 			return false;
-		} else {
-			
-			return true;
-		}
+		}		
+		
+		return true;
 	}
+
 	
 	public void startScanning(){
 		
@@ -170,6 +189,35 @@ public class AssassinService extends Service {
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void addEventListener(String name, EventListener listener) {
+		dispatcher.addEventListener(name, listener);
+		
+	}
+
+	@Override
+	public void dispatchEvent(String name, Object data) {
+		dispatcher.dispatchEvent(name, data);
+		
+	}
+
+	@Override
+	public void removeEventListeners(String name) {
+		dispatcher.removeEventListeners(name);
+		
+	}
+
+	@Override
+	public void removeEventListener(String name, EventListener listenerAddress) {
+		dispatcher.removeEventListener(name, listenerAddress);
+		
+	}
+
+	@Override
+	public Boolean hasEventListener(String name, EventListener listener) {
+		return dispatcher.hasEventListener(name, listener);
 	}
 
 }

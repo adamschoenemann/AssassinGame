@@ -106,6 +106,7 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	@Override
 	protected void onCancelled(String result){
 		super.onCancelled();
+		Log.d(Globals.DEBUG, "HttpRequest canceled");
 		dispatchEvent(Event.FAILURE, null);
 	}
 
@@ -130,6 +131,12 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	@Override
 	public void removeEventListener(String name, EventListener listenerAddress) {
 		dispatcher.removeEventListener(name, listenerAddress);
+		
+	}
+
+	@Override
+	public Boolean hasEventListener(String name, EventListener listener) {
+		return dispatcher.hasEventListener(name, listener);
 		
 	}
 	

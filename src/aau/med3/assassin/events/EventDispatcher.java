@@ -50,19 +50,32 @@ public class EventDispatcher implements IEventDispatcher {
 //		Log.d(TAG, "removeEventListeners called");
 	}
 	
-	public void removeEventListener(String name, EventListener listenerAddress){
+	public void removeEventListener(String name, EventListener listener){
 		List<EventListener> listeners = events.get("name");
 		if(listeners == null) return;
 		
 		Integer index = 0;
-		for(EventListener listener : listeners){
-			if(listener == listenerAddress){
+		for(EventListener l : listeners){
+			if(l.getClass().equals(listener.getClass())){
 				listeners.remove(index);
-				break;
+				return;
 			}
 			index++;
 		}
 //		Log.d(TAG, "removeEventListener called");
+	}
+	
+	public Boolean hasEventListener(String name, EventListener listener){
+		List<EventListener> listeners = events.get("name");
+		if(listeners == null) return false;
+		Integer index = 0;
+		for(EventListener l : listeners){
+			if(l.getClass().equals(listener.getClass())){
+				return true;
+			}
+			index++;
+		}
+		return false;
 	}
 	
 }

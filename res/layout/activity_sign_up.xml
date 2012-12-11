@@ -1,26 +1,22 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SignInActivity" >
 
     <LinearLayout
-        android:id="@+id/user_create_layout"
+        android:id="@+id/signup_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingTop="5dp" >
+        android:orientation="vertical" >
 
         <EditText
             android:id="@+id/form_first_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:hint="First Name"
             android:inputType="textPersonName"
-            android:tag="first_name"
-            android:text="First Name" >
+            android:tag="first_name" >
 
             <requestFocus />
         </EditText>
@@ -30,16 +26,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="Last Name"
             android:inputType="textPersonName"
-            android:tag="last_name"
-            android:text="Last Name" />
+            android:tag="last_name" />
 
         <TextView
-            android:id="@+id/label_form_educations"
+            android:id="@+id/signup_education_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Education"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/signup_education_hint" />
 
         <Spinner
             android:id="@+id/form_educations"
@@ -48,30 +45,23 @@
             android:entries="@array/educations"
             android:tag="education" />
 
-        <TextView
-            android:id="@+id/label_form_pwd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Password"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
         <EditText
             android:id="@+id/form_pwd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="Password"
             android:inputType="textPassword"
-            android:tag="password"
-            android:text="Password" />
+            android:tag="password" />
 
         <EditText
             android:id="@+id/form_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="Email address"
             android:inputType="textEmailAddress"
-            android:tag="email"
-            android:text="test@email.com" />
+            android:tag="email" />
 
         <Button
             android:id="@+id/form_submit"
@@ -82,4 +72,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</ScrollView>
