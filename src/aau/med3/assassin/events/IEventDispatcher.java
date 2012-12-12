@@ -6,4 +6,5 @@ public interface IEventDispatcher {
 	void removeEventListeners(String name);
 	void removeEventListener(String name, EventListener listener);
 	Boolean hasEventListener(String name, EventListener listener);
+	void removeAllEventListeners();
 }

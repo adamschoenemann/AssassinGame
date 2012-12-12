@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -38,12 +39,6 @@ import android.widget.TextView;
  * well.
  */
 public class LoginActivity extends Activity {
-	/**
-	 * A dummy authentication store containing known user names and passwords.
-	 * TODO: remove after connecting to a real authentication system.
-	 */
-	private static final String[] DUMMY_CREDENTIALS = new String[] {
-			"foo@example.com:hello", "bar@example.com:world" };
 
 	/**
 	 * The default email to populate the email field with.
@@ -196,6 +191,7 @@ public class LoginActivity extends Activity {
 			showProgress(true);
 			userCRUD = new UserCRUD();
 			userCRUD.addEventListener(Event.SUCCESS, new RequestSuccessHandler());
+			userCRUD.addEventListener(Event.FAILURE, new RequestFailedHandler());
 			userCRUD.read(mEmail);
 		}
 	}
@@ -217,7 +213,19 @@ public class LoginActivity extends Activity {
 		dialog.show();
 	}
 	
-	public class RequestSuccessHandler implements EventListener {
+	public void showDialog(String msg, DialogInterface.OnClickListener listener ){
+		AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+		builder.setTitle("User Login")
+			.setMessage(msg)
+			.setCancelable(false)
+			.setNegativeButton("OK", listener);
+		
+		AlertDialog dialog = builder.create();
+		
+		dialog.show();
+	}
+	
+	private class RequestSuccessHandler implements EventListener {
 
 		@Override
 		public void handle(Event evt){
@@ -225,7 +233,7 @@ public class LoginActivity extends Activity {
 				JSONArray data = (JSONArray) evt.data;
 				if(data.length() > 0){
 					JSONObject json = data.getJSONObject(0);
-					Log.d(Globals.DEBUG, "JSON: " + json.toString());
+//					Log.d(Globals.DEBUG, "JSON: " + json.toString());
 					Log.d(Globals.DEBUG, "User with valid email found");
 					if(json.getString("email").equals(mEmail)){
 						Log.d(Globals.DEBUG, "Email is correct");
@@ -233,7 +241,17 @@ public class LoginActivity extends Activity {
 							// User authenticated! Login!
 							AssassinGame app = (AssassinGame) getApplication();
 							app.login(json);
-							showDialog("User successfully logged in!");
+							
+							showDialog("User successfully logged in!", new DialogInterface.OnClickListener() {
+								
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.cancel();
+									Intent intent = new Intent(LoginActivity.this, StatusActivity.class);
+									startActivity(intent);
+								}
+							});
+							
 							Log.d(Globals.DEBUG, "User successfully logged in!");
 						} else {
 							Log.d(Globals.DEBUG, "Email: " + mEmail + " and password: " + mPassword + " dont match");
@@ -247,13 +265,13 @@ public class LoginActivity extends Activity {
 				}
 				
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 			showProgress(false);

@@ -139,5 +139,11 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 		return dispatcher.hasEventListener(name, listener);
 		
 	}
+
+	@Override
+	public void removeAllEventListeners() {
+		dispatcher.removeAllEventListeners();
+		
+	}
 	
 }

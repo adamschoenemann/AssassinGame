@@ -38,11 +38,7 @@
         <activity
             android:name="aau.med3.assassin.activities.MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            
         </activity>
         <activity
             android:name="aau.med3.assassin.activities.SignUpActivity"
@@ -61,14 +57,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="aau.med3.assassin.activities.MainActivity" />
         </activity>
-        <activity
-            android:name="aau.med3.assassin.activities.GameActivity"
-            android:label="@string/title_activity_game"
-            android:parentActivityName="aau.med3.assassin.activities.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="aau.med3.assassin.activities.MainActivity" />
-        </activity>
+        
         <activity
             android:name="aau.med3.assassin.activities.UserInfoActivity"
             android:label="@string/title_activity_user_info"
@@ -99,6 +88,11 @@
         <activity
             android:name="aau.med3.assassin.activities.StatusActivity"
             android:label="@string/title_activity_status" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

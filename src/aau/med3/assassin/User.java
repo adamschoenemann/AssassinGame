@@ -13,7 +13,7 @@ import android.util.Log;
 public class User {
 
 	private static final String TAG = "User";
-	public String email, MAC, target_MAC; 
+	public String email, MAC, target_MAC, password; 
 	public Integer ID, points;
 	public Boolean loggedIn;
 	public SharedPreferences prefs;
@@ -26,6 +26,7 @@ public class User {
 	public void fromJSON(JSONObject json){
 		try {
 			email = json.getString("email");
+			password = json.getString("password");
 			MAC = json.getString("MAC");
 			target_MAC = json.getString("target_MAC");
 			ID = json.getInt("ID");
@@ -40,6 +41,7 @@ public class User {
 	public JSONObject toJSON() throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("email", email);
+		json.put("password", email);
 		json.put("MAC", MAC);
 		json.put("target_MAC", target_MAC);
 		json.put("ID", ID);
@@ -60,6 +62,7 @@ public class User {
 			editor.putString("target_MAC", target_MAC);
 			editor.putInt("ID", ID);
 			editor.putInt("points", points);
+			editor.putString("password", password);
 			editor.commit();
 			Log.d(TAG, "User saved!");
 		}
@@ -69,6 +72,7 @@ public class User {
 
 		String defValue = "";
 		email = prefs.getString("email", defValue);
+		password = prefs.getString("password", defValue);
 		MAC = prefs.getString(MAC, defValue);
 		target_MAC = prefs.getString("target_MAC", defValue);
 		ID = prefs.getInt("ID", 0);
@@ -134,7 +138,7 @@ public class User {
 
 				@Override
 				public void handle(Event e) {
-					Log.d(Globals.DEBUG, "Used synchronized to server");
+					Log.d(Globals.DEBUG, "User synchronized to server");
 					
 				}
 				

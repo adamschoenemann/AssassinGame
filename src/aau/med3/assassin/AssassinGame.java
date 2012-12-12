@@ -3,12 +3,12 @@ package aau.med3.assassin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gcm.GCMRegistrar;
-
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import com.google.android.gcm.GCMRegistrar;
 
 public class AssassinGame extends Application {
 	
@@ -17,6 +17,7 @@ public class AssassinGame extends Application {
 	@Override
 	public void onCreate(){
 		Log.d(Globals.DEBUG, "Game started!");
+		/*
 		// Check if user data is saved
 		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 		Integer ID = prefs.getInt("ID", 0);
@@ -28,12 +29,8 @@ public class AssassinGame extends Application {
 			startAssassinService();
 		}
 		Log.d(Globals.DEBUG, "User_ID: " + ID.toString());
-		
-		try {
-			DB.userCols = new JSONObject("{\"ID\" : \"ID\", \"email\":\"email\", \"password\": \"password\", \"phone_ID\" : \"phone_ID\", \"target_ID\" : \"target_ID\", \"education\": \"education\" }");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		*/
+
 	}
 	
 	public void login(JSONObject userData){
@@ -60,6 +57,16 @@ public class AssassinGame extends Application {
 		}
 
 	}
+	
+	public void logOut(){
+		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.clear();
+		editor.commit();
+		Globals.user = null;
+		
+	}
+	
 	
 	public void startAssassinService(){
 		Log.d(Globals.DEBUG, "Attempting to start AssassinService");

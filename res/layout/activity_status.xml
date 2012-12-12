@@ -1,35 +1,100 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ScrollView1"
+    android:id="@+id/status_merge_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".StatusActivity" >
+    android:layout_height="match_parent" >
+
+    <ScrollView
+        android:id="@+id/status_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".StatusActivity" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <CheckBox
+                android:id="@+id/status_cb_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Bluetooth" />
+
+            <CheckBox
+                android:id="@+id/status_cb_disc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Discoverable" />
+
+            <CheckBox
+                android:id="@+id/status_cb_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Network Access" />
+
+            <LinearLayout
+                android:id="@+id/status_loggedin_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/status_cb_logged_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:text="Logged In" />
+
+                <Button
+                    android:id="@+id/status_btn_log_in"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="Log In" />
+
+                <Button
+                    android:id="@+id/status_btn_log_out"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="Log Out" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/status_btn_kill"
+                android:layout_width="136dp"
+                android:layout_height="wrap_content"
+                android:text="Kill" />
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
+        android:id="@+id/status_layout_loading"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
 
-        <CheckBox
-            android:id="@+id/checkBox1"
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/status_loading_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bluetooth" />
-
-        <CheckBox
-            android:id="@+id/checkBox2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Discoverable" />
-
-        <CheckBox
-            android:id="@+id/checkBox3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Network Access" />
+            android:text="Medium Text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
     </LinearLayout>
 
-   
-
-</ScrollView>
+</merge>

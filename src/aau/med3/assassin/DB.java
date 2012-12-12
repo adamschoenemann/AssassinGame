@@ -1,6 +1,6 @@
 package aau.med3.assassin;
 
-import org.json.JSONObject;
+
 
 public class DB {
 	
@@ -22,5 +22,5 @@ public class DB {
 		public static final String ID = "ID", MAC = "MAC";
 	}
 	
-	public static JSONObject userCols;
+	
 }

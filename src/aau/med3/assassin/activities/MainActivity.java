@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
     
     public void btn_game_onclick(View view){
     	if(Globals.assassinService != null && Globals.assassinService.running){
-    		Intent intent = new Intent(this, GameActivity.class);
+    		Intent intent = new Intent(this, StatusActivity.class);
         	startActivity(intent);
     	}
     	

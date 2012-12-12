@@ -43,7 +43,7 @@ public class UserCRUD extends EventDispatcher {
 		JSONObject json;
 		try {
 			json = new JSONObject();
-			json.put(DB.userCols.getString("ID"), ID);
+			json.put("ID", ID);
 			req.params = json;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -58,7 +58,7 @@ public class UserCRUD extends EventDispatcher {
 		JSONObject json;
 		try {
 			json = new JSONObject();
-			json.put(DB.userCols.getString("email"), email);
+			json.put("email", email);
 			req.params = json;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

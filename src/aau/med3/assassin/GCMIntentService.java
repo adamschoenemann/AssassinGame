@@ -2,6 +2,7 @@ package aau.med3.assassin;
 
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +40,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 	@Override
 	protected void onMessage(Context ctx, Intent intent) {
 		Log.d(TAG, "GCM Message Received!");
-		
+		if(Globals.user != null && Globals.user.loggedIn)
+			Globals.user.syncFromServer();
+
 	}
 
 	@Override
@@ -48,11 +51,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 		try {
 			UserCRUD crud = new UserCRUD();
 			User user = Globals.user;
+			if(user == null)
+				return;
 			JSONObject data = new JSONObject();
 			data.put("ID", user.ID);
 			data.put("regId", regId);
-
-			
 			crud.update(data);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
