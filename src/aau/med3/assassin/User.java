@@ -1,26 +1,51 @@
 package aau.med3.assassin;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.EventListenerProxy;
+import java.util.Locale;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.CRUD.UserCRUD;
 import aau.med3.assassin.events.Event;
+import aau.med3.assassin.events.EventDispatcher;
 import aau.med3.assassin.events.EventListener;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-public class User {
+public class User extends EventDispatcher {
 
 	private static final String TAG = "User";
+
+	public static final String 	UPDATED = "userUpdated",
+									LOGGED_IN = "userLoggedIn",
+									LOGGED_OUT = "userLoggedOut";
+	
+	public Timestamp timestamp;
 	public String email, MAC, target_MAC, password; 
 	public Integer ID, points;
-	public Boolean loggedIn;
+	public Boolean loggedIn, alive;
 	public SharedPreferences prefs;
+	
+	private class UserUpdatedHandler implements EventListener {
+
+		@Override
+		public void handle(Event e) {
+			timestamp = new Timestamp(new Date().getTime());
+			
+		}
+		
+	}
 	
 	public User(SharedPreferences prefs){
 		this.prefs = prefs;
 		loggedIn = false;
+		addEventListener(UPDATED, new UserUpdatedHandler());
 	}
 	
 	public void fromJSON(JSONObject json){
@@ -31,7 +56,11 @@ public class User {
 			target_MAC = json.getString("target_MAC");
 			ID = json.getInt("ID");
 			points = json.getInt("points");
+			timestamp = timestampFromString(json.getString("timestamp"));
+			alive = (json.getInt("alive") == 1) ? true : false;
 			loggedIn = true;
+			dispatchEvent(UPDATED, null);
+			dispatchEvent(LOGGED_IN, null);
 			
 		} catch (JSONException e){
 			e.printStackTrace();
@@ -41,11 +70,12 @@ public class User {
 	public JSONObject toJSON() throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("email", email);
-		json.put("password", email);
+		json.put("password", password);
 		json.put("MAC", MAC);
 		json.put("target_MAC", target_MAC);
 		json.put("ID", ID);
 		json.put("points", points);
+		json.put("alive", alive);
 		
 		return json;
 		
@@ -68,18 +98,18 @@ public class User {
 		}
 	}
 	
-	public void load(){
-
-		String defValue = "";
-		email = prefs.getString("email", defValue);
-		password = prefs.getString("password", defValue);
-		MAC = prefs.getString(MAC, defValue);
-		target_MAC = prefs.getString("target_MAC", defValue);
-		ID = prefs.getInt("ID", 0);
-		points = prefs.getInt("points", 0);
-		
-		loggedIn = true;
-	}
+//	public void load(){
+//
+//		String defValue = "";
+//		email = prefs.getString("email", defValue);
+//		password = prefs.getString("password", defValue);
+//		MAC = prefs.getString(MAC, defValue);
+//		target_MAC = prefs.getString("target_MAC", defValue);
+//		ID = prefs.getInt("ID", 0);
+//		points = prefs.getInt("points", 0);
+//		
+//		loggedIn = true;
+//	}
 	
 	public void kill(String MAC){
 		UserCRUD userCRUD = new UserCRUD();
@@ -90,12 +120,14 @@ public class User {
 				try {
 					JSONArray data = (JSONArray) evt.data;
 					JSONObject json = data.getJSONObject(0);
-					if(true){
-						target_MAC = json.getString("target_MAC");
-						 points++;
-						
-						Log.d(Globals.DEBUG, "Target " + json.getString("ID") + "sucessfully killed");
-					}
+					
+					target_MAC = json.getString("target_MAC");
+					points++;
+					
+					dispatchEvent(UPDATED, null);
+					syncToServer(false);
+					Log.d(Globals.DEBUG, "Target " + json.getString("ID") + "sucessfully killed");
+					
 				} catch (JSONException e) {
 					
 					e.printStackTrace();
@@ -115,7 +147,9 @@ public class User {
 			public void handle(Event evt) {
 				try {
 					JSONObject json = ((JSONArray) evt.data).getJSONObject(0);
-					fromJSON(json);
+					fromJSON(json); // Dispatches UPDATED
+					Log.d(TAG, "Synced from server");
+					
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -128,11 +162,18 @@ public class User {
 		
 	}
 	
-	public void syncToServer() {
+	public void syncToServer(){
+		syncToServer(true);
+	}
+	
+	public void syncToServer(Boolean push) {
 		
 		try {
 			JSONObject json;
 			json = toJSON();
+			if(push == false){
+				json.put("push", 0);
+			}
 			UserCRUD crud = new UserCRUD();
 			crud.addEventListener(Event.SUCCESS, new EventListener(){
 
@@ -151,5 +192,52 @@ public class User {
 		
 	}
 	
+	public void synchronize(){
+		
+		UserCRUD crud = new UserCRUD();
+		crud.addEventListener(Event.SUCCESS, new EventListener() {
+			
+			@Override
+			public void handle(Event evt) {
+				try {
+					JSONObject data = ((JSONArray) evt.data).getJSONObject(0);
+					Timestamp stamp = timestampFromString(data.getString("timestamp"));
+					if(stamp.after(timestamp)){ // Server info is newer
+						syncFromServer();
+					} else {
+						syncToServer(false);
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
+		crud.addEventListener(Event.FAILURE, new EventListener() {
+			
+			@Override
+			public void handle(Event e) {
+				User.this.dispatchEvent(Event.FAILURE, null);				
+			}
+		});
+		
+		crud.read(ID);
+	}
+	
+	private Timestamp timestampFromString(String in){
+
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+			Date date = sdf.parse(in);
+			Timestamp stamp = new Timestamp(date.getTime());
+			return stamp;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 }

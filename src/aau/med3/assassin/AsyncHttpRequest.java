@@ -35,7 +35,7 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	private EventDispatcher dispatcher = new EventDispatcher();
 //	public HashMap<String, String> params = new HashMap<String, String>();
 	
-	protected String readStream(InputStream in){
+	protected String readStream(InputStream in) throws IOException{
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
@@ -48,7 +48,11 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 			reader.close();
 			return sb.toString();
 		} catch (Exception e) {
+			exception = e;
 			e.printStackTrace();
+			cancel(false);
+		} finally {
+			reader.close();
 		}
 		return "";
 	}
@@ -86,9 +90,14 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 			cancel(false);
 		} catch (IOException e) {
 			exception = e;
+			Log.d(Globals.DEBUG, "IO Exception!");
 			e.printStackTrace();
 			cancel(false);
 		} catch (JSONException e) {
+			exception = e;
+			e.printStackTrace();
+			cancel(false);
+		} catch (Exception e) {
 			exception = e;
 			e.printStackTrace();
 			cancel(false);
@@ -105,6 +114,13 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	
 	@Override
 	protected void onCancelled(String result){
+		super.onCancelled();
+		Log.d(Globals.DEBUG, "HttpRequest canceled");
+		dispatchEvent(Event.FAILURE, null);
+	}
+	
+	@Override
+	protected void onCancelled(){
 		super.onCancelled();
 		Log.d(Globals.DEBUG, "HttpRequest canceled");
 		dispatchEvent(Event.FAILURE, null);

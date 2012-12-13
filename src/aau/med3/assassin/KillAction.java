@@ -34,7 +34,7 @@ public class KillAction extends EventDispatcher {
 	}
 	
 	public Boolean bootstrap(){
-		StateMachine sm = new StateMachine(ctx);
+		StateTracker sm = new StateTracker(ctx);
 		Boolean allGood = true;
 		
 		if(!sm.isBTDiscoverable())

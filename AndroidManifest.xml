@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="aau.med3.assassin"
     android:versionCode="1"
+    android:installLocation="preferExternal"
     android:versionName="1.1" >
 
     <uses-sdk
@@ -43,6 +44,7 @@
         <activity
             android:name="aau.med3.assassin.activities.SignUpActivity"
             android:label="@string/title_activity_sign_in"
+            android:windowSoftInputMode="stateUnchanged"
             android:parentActivityName="aau.med3.assassin.activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -51,8 +53,8 @@
         <activity
             android:name="aau.med3.assassin.activities.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName="aau.med3.assassin.activities.MainActivity"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            android:windowSoftInputMode="stateUnchanged"
+            android:parentActivityName="aau.med3.assassin.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="aau.med3.assassin.activities.MainActivity" />
@@ -86,8 +88,8 @@
         </receiver>
 
         <activity
-            android:name="aau.med3.assassin.activities.StatusActivity"
-            android:label="@string/title_activity_status" >
+            android:name="aau.med3.assassin.activities.DashboardActivity"
+            android:label="@string/title_activity_dashboard" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -3,7 +3,7 @@ package aau.med3.assassin;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import aau.med3.assassin.activities.StatusActivity;
+import aau.med3.assassin.activities.DashboardActivity;
 import aau.med3.assassin.events.BluetoothEvent;
 import aau.med3.assassin.events.Event;
 import aau.med3.assassin.events.EventDispatcher;
@@ -31,7 +31,8 @@ public class AssassinService extends Service implements IEventDispatcher {
 	private final static String TAG = "ASSASSIN_SERVICE";
 	
 	public final static String 	RESUMED = "serviceResumed",
-									PAUSED = "servicePaused";
+									PAUSED = "servicePaused",
+									SERVICE_CREATED = "serviceCreated";
 	
 	public BluetoothClient btClient;
 
@@ -42,6 +43,8 @@ public class AssassinService extends Service implements IEventDispatcher {
 	private Timer timer;
 	private final Integer INTERVAL = 20;
 	private final static Integer NOTIFICATION_ID = 12;
+
+
 	public Boolean running = false;
 		
 	private class UpdateTask extends TimerTask {
@@ -76,7 +79,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 	
 	private void createNotification(String title, String content, Intent resultIntent){
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-		.setDefaults(Notification.DEFAULT_VIBRATE)
+//		.setDefaults(Notification.DEFAULT_VIBRATE)
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setContentTitle(title)
 		.setContentText(content);
@@ -84,7 +87,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 		
 		
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-		stackBuilder.addParentStack(StatusActivity.class);
+		stackBuilder.addParentStack(DashboardActivity.class);
 		stackBuilder.addNextIntent(resultIntent);
 		
 		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -104,6 +107,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 		
 		btClient.addEventListener(BluetoothEvent.DEVICE_FOUND, new DeviceFoundListener());
 		btClient.addEventListener(BluetoothEvent.DISCOVERY_FINISHED, new DiscoveryFinishedListener());
+		Globals.events.dispatchEvent(SERVICE_CREATED, null);
 		Globals.assassinService = this;
 		
 		startScanning();
@@ -111,7 +115,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 	}
 	
 	public Boolean isConnected(){
-		StateMachine state = new StateMachine(this);
+		StateTracker state = new StateTracker(this);
 		if(state.isBTEnabled() == false || state.isBTDiscoverable() == false){
 			Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
@@ -124,7 +128,11 @@ public class AssassinService extends Service implements IEventDispatcher {
 			Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
 			createNotification("Enable Connectivity", "Please enable internet connectivity to continue", intent);
 			return false;
-		}		
+		}
+		
+		if(Globals.user == null || Globals.user.loggedIn == false){
+			return false;
+		}
 		
 		return true;
 	}
@@ -189,7 +197,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 			
 			if(device.getAddress().equals(Globals.user.target_MAC)){
 				createNotification("Target detected!", "Your target was detected in the area!", 
-						new Intent(AssassinService.this, StatusActivity.class));
+						new Intent(AssassinService.this, DashboardActivity.class));
 				Log.d(TAG, "Target found!");
 //				btClient.cancel();
 			}

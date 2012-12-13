@@ -3,6 +3,7 @@ package aau.med3.assassin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import aau.med3.assassin.CRUD.UserCRUD;
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,10 +47,13 @@ public class AssassinGame extends Application {
         
         if(regId.equals(userData.getString("regId")) == false){
         	GCMRegistrar.register(this, Globals.SENDER_ID);
+
         } else {
         	Log.d(Globals.DEBUG, "Already registered");
         }
 		
+        Globals.events.dispatchEvent(User.LOGGED_IN, null);
+        
 		// Start assassin service
 		startAssassinService();
 		} catch (JSONException e){
@@ -63,7 +67,9 @@ public class AssassinGame extends Application {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.clear();
 		editor.commit();
+		Globals.events.dispatchEvent(User.LOGGED_OUT, null);
 		Globals.user = null;
+		
 		
 	}
 	

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
+import aau.med3.assassin.User;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -30,23 +31,38 @@ public class UserInfoActivity extends Activity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 
+		
+		
+	}
+	
+	@Override
+	public void onStart(){
+		super.onStart();
 		listView = (ListView) findViewById(R.id.list_user_info);
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, items);
 		listView.setAdapter(adapter);
 
-		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
-		HashMap<String, ?> prefMap = (HashMap<String, ?>) prefs.getAll();
-		for (Map.Entry<String, ?> entry : prefMap.entrySet()){
-			String key = entry.getKey();
-			String val = entry.getValue().toString();
-			items.add(key + ": " + val);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		User user = Globals.user;
+		if(user != null){
+			map.put("ID", user.ID);
+			map.put("Email", user.email);
+			map.put("MAC", user.MAC);
+			map.put("Target MAC", user.target_MAC);
+			map.put("Points", user.points);
+			map.put("Alive", user.alive);
+			
+			for (Map.Entry<String, ?> entry : map.entrySet()){
+				String key = entry.getKey();
+				String val = entry.getValue().toString();
+				items.add(key + ": " + val);
+			}
+		
 		}
-		
-		
 		adapter.notifyDataSetChanged();
-		
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

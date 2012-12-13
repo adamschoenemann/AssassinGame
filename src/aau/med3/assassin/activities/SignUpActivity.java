@@ -1,11 +1,13 @@
 package aau.med3.assassin.activities;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.android.gcm.GCMRegistrar;
 
 import aau.med3.assassin.AssassinGame;
 import aau.med3.assassin.Globals;
@@ -13,60 +15,78 @@ import aau.med3.assassin.R;
 import aau.med3.assassin.SimpleSHA1;
 import aau.med3.assassin.CRUD.UserCRUD;
 import aau.med3.assassin.events.Event;
-import aau.med3.assassin.events.EventHandler;
 import aau.med3.assassin.events.EventListener;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 public class SignUpActivity extends Activity {
 
+	private ScrollView signUpLayout;
+	private LinearLayout statusLayout;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sign_up);
 		
+		signUpLayout = (ScrollView) findViewById(R.id.signup_layout_container);
+		statusLayout = (LinearLayout) findViewById(R.id.signup_status);
 		
 		// Show the Up button in the action bar.
-		//getActionBar().setDisplayHomeAsUpEnabled(true);
+		setupActionBar();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_sign_in, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+	
+	public void onSubmitClicked(View view){
+		attemptLogin();
 	}
 	
-	public void onSubmitClicked(View view) throws IOException{
+	public void attemptLogin(){
+		TextView pwdForm = (TextView) findViewById(R.id.form_pwd);
+		TextView emailForm = (TextView) findViewById(R.id.form_email);
+		View focusView = null;
+		
+		pwdForm.setError(null);
+		emailForm.setError(null);
+		
+		String pwd = pwdForm.getText().toString();
+		String email = emailForm.getText().toString();
+		
+		Boolean cancel = false;
+		if(TextUtils.isEmpty(email) || (!email.contains("@"))){
+			cancel = true;
+			emailForm.setError("Email must contain @");
+			focusView = emailForm;
+		}
+		if(pwd.length() < 6){
+			cancel = true;
+			pwdForm.setError("Password must be at least six characters long");
+			focusView = pwdForm;
+		}
+		
+		if(cancel == true){
+			if(focusView != null) focusView.requestFocus();
+		} else {
+			createNewUser();
+		}
+	}
+	
+	public void createNewUser() {
 		
 		JSONObject usrData;
 		try {
@@ -91,8 +111,10 @@ public class SignUpActivity extends Activity {
 							sha1 = SimpleSHA1.SHA1(plainpw);
 							Log.d(Globals.DEBUG, "Encrypted pwd: " + sha1);
 							usrData.put(v.getTag().toString(), sha1);
+							
 						} catch (NoSuchAlgorithmException e) {
-							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
 						
@@ -119,8 +141,16 @@ public class SignUpActivity extends Activity {
 			
 			usrData.put("MAC", MAC);
 			
+			// Get GCM regID
+			String regId = GCMRegistrar.getRegistrationId(this);
+			if(regId.equals("")){
+				GCMRegistrar.register(this, Globals.SENDER_ID);
+				regId = GCMRegistrar.getRegistrationId(this);
+			}
+			usrData.put("regId", regId);
+			
 			UserCRUD usr = new UserCRUD();
-			usr.addEventListener(Event.SUCCESS, new UserDataHandler());
+			usr.addEventListener(Event.SUCCESS, new RequestSuccessHandler());
 			usr.create(usrData);
 
 			
@@ -133,7 +163,7 @@ public class SignUpActivity extends Activity {
 				
 	}
 	
-	public class UserDataHandler implements EventListener {
+	public class RequestSuccessHandler implements EventListener {
 		public void handle(Event evt){
 			
 			AssassinGame app = (AssassinGame) getApplication();
@@ -164,26 +194,38 @@ public class SignUpActivity extends Activity {
 		}
 	}
 	
-	public class PhoneDataHandler implements EventHandler<JSONArray>{
-		@Override
-		public void onEvent(JSONArray data) {
-			try {
-				SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
-				SharedPreferences.Editor editor = prefs.edit();
-				JSONObject json = data.getJSONObject(0);
-			
-				editor.putString("MAC", json.getString("MAC"));
-				editor.putInt("phone_ID", json.getInt("ID"));
-				
-				editor.commit();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void setupActionBar() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			// Show the Up button in the action bar.
+			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_sign_in, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// This ID represents the Home or Up button. In the case of this
+			// activity, the Up button is shown. Use NavUtils to allow users
+			// to navigate up one level in the application structure. For
+			// more details, see the Navigation pattern on Android Design:
+			//
+			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
+			//
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 	
 
 }

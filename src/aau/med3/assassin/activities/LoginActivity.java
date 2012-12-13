@@ -40,10 +40,6 @@ import android.widget.TextView;
  */
 public class LoginActivity extends Activity {
 
-	/**
-	 * The default email to populate the email field with.
-	 */
-	public static final String EXTRA_EMAIL = "com.example.android.authenticatordemo.extra.EMAIL";
 
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
@@ -69,7 +65,7 @@ public class LoginActivity extends Activity {
 		setupActionBar();
 
 		// Set up the login form.
-		mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
+		
 		mEmailView = (EditText) findViewById(R.id.email);
 //		mEmailView.setText(mEmail);
 
@@ -92,12 +88,21 @@ public class LoginActivity extends Activity {
 		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
 
 		findViewById(R.id.sign_in_button).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						attemptLogin();
-					}
-				});
+			new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					attemptLogin();
+				}
+			});
+		
+		findViewById(R.id.login_btn_sign_up).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	/**
@@ -247,7 +252,7 @@ public class LoginActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.cancel();
-									Intent intent = new Intent(LoginActivity.this, StatusActivity.class);
+									Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
 									startActivity(intent);
 								}
 							});
@@ -285,7 +290,8 @@ public class LoginActivity extends Activity {
 		@Override
 		public void handle(Event e) {
 			showDialog("Login attempt failed");
-			
+			showProgress(false);
+			userCRUD = null;
 		}
 		
 	}

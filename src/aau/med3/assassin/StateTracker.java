@@ -6,11 +6,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class StateMachine extends EventDispatcher {
+public class StateTracker extends EventDispatcher {
 	
 	private Context ctx;
 	
-	public StateMachine(Context ctx){
+	public StateTracker(Context ctx){
 		this.ctx = ctx;
 	}
 	

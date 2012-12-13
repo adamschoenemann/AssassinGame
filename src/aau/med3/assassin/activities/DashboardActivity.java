@@ -9,7 +9,7 @@ import aau.med3.assassin.AssassinService;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.KillAction;
 import aau.med3.assassin.R;
-import aau.med3.assassin.StateMachine;
+import aau.med3.assassin.StateTracker;
 import aau.med3.assassin.User;
 import aau.med3.assassin.CRUD.UserCRUD;
 import aau.med3.assassin.events.BluetoothEvent;
@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 // TODO: Rename to dashboard
-public class StatusActivity extends Activity {
+public class DashboardActivity extends Activity {
 	
 	private final static String TAG = "StatusActivity";
 	
@@ -41,6 +41,8 @@ public class StatusActivity extends Activity {
 	private Button btnLogIn;
 	private Button btnLogOut;
 	private Button btnKill;
+	private Button btnInfo;
+	private Button btnSync;
 	private View viewLoading;
 	private TextView loadMsg;
 	
@@ -50,23 +52,25 @@ public class StatusActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_status);
+		setContentView(R.layout.activity_dashboard);
 
-		cbLoggedIn = (CheckBox) findViewById(R.id.status_cb_logged_in);
-		cbBTEnabled = (CheckBox) findViewById(R.id.status_cb_bt);
-		cbBTDiscoverable = (CheckBox) findViewById(R.id.status_cb_disc);
-		cbNetworkEnabled = (CheckBox) findViewById(R.id.status_cb_network);
-		btnLogIn = (Button) findViewById(R.id.status_btn_log_in);
-		btnLogOut = (Button) findViewById(R.id.status_btn_log_out);
-		btnKill = (Button) findViewById(R.id.status_btn_kill);
-		viewLoading = (View) findViewById(R.id.status_layout_loading);
-		loadMsg = (TextView) findViewById(R.id.status_loading_msg);
+		cbLoggedIn = (CheckBox) findViewById(R.id.dash_cb_logged_in);
+		cbBTEnabled = (CheckBox) findViewById(R.id.dash_cb_bt);
+		cbBTDiscoverable = (CheckBox) findViewById(R.id.dash_cb_disc);
+		cbNetworkEnabled = (CheckBox) findViewById(R.id.dash_cb_network);
+		btnLogIn = (Button) findViewById(R.id.dash_btn_log_in);
+		btnLogOut = (Button) findViewById(R.id.dash_btn_log_out);
+		btnKill = (Button) findViewById(R.id.dash_btn_kill);
+		btnInfo = (Button) findViewById(R.id.dash_btn_info);
+		btnSync = (Button) findViewById(R.id.dash_btn_sync);
+		viewLoading = (View) findViewById(R.id.dash_layout_loading);
+		loadMsg = (TextView) findViewById(R.id.dash_loading_msg);
 		
 		btnLogIn.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(StatusActivity.this, LoginActivity.class);
+				Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
 				startActivity(intent);
 			}
 			
@@ -78,7 +82,7 @@ public class StatusActivity extends Activity {
 			public void onClick(View view) {
 				((AssassinGame) getApplication()).logOut();
 				refresh();
-				Toast.makeText(StatusActivity.this, "Successfully loged out.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(DashboardActivity.this, "Successfully loged out.", Toast.LENGTH_SHORT).show();
 			}
 			
 		});
@@ -88,6 +92,27 @@ public class StatusActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				onBtnKillPressed();
+				
+			}
+		});
+		
+		btnInfo.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(DashboardActivity.this, UserInfoActivity.class));
+				
+			}
+		});
+		
+		btnSync.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(Globals.user != null && Globals.user.loggedIn == true){
+//					Globals.user.syncToServer();
+					Globals.user.synchronize();
+				}
 				
 			}
 		});
@@ -136,11 +161,11 @@ public class StatusActivity extends Activity {
 				String msg = (String) e.data;
 				if(msg.equals(KillAction.SUCCESS)){
 					Globals.user.kill(Globals.user.target_MAC);
-					Toast.makeText(StatusActivity.this, "Target succesfully killed!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(DashboardActivity.this, "Target succesfully killed!", Toast.LENGTH_SHORT).show();
 				}
 				if(msg.equals(KillAction.TARGET_NOT_FOUND)){
 					Log.d(TAG, "Target not found");
-					Toast.makeText(StatusActivity.this, "Target not found!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(DashboardActivity.this, "Target not found!", Toast.LENGTH_SHORT).show();
 				}
 				
 				if(killAction != null){
@@ -174,7 +199,7 @@ public class StatusActivity extends Activity {
 		viewLoading.setVisibility(View.VISIBLE);
 		loadMsg.setText("Refreshing ...");
 		
-		StateMachine sm = new StateMachine(this);
+		StateTracker sm = new StateTracker(this);
 		cbNetworkEnabled.setChecked( (sm.isNetworkConnected()) ? true : false);
 		cbBTEnabled.setChecked( (sm.isBTEnabled()) ? true : false);
 		cbBTDiscoverable.setChecked( (sm.isBTDiscoverable()) ? true : false);
@@ -215,7 +240,7 @@ public class StatusActivity extends Activity {
 		SharedPreferences prefs = getSharedPreferences(Globals.PREF_FILENAME, MODE_PRIVATE);
 		String email = prefs.getString("email", "");
 		String password = prefs.getString("password", "");
-		StateMachine sm = new StateMachine(this);
+		StateTracker sm = new StateTracker(this);
 		
 		Log.d(TAG, "email: " + email + " password: " + password);
 		
@@ -241,10 +266,10 @@ public class StatusActivity extends Activity {
 							viewLoading.setVisibility(View.GONE);
 							loadMsg.setText("");
 							
-							Toast.makeText(StatusActivity.this, "Logged in!", Toast.LENGTH_SHORT).show();
+							Toast.makeText(DashboardActivity.this, "Logged in!", Toast.LENGTH_SHORT).show();
 							refresh();
 						} catch (JSONException e) {
-							Toast.makeText(StatusActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+							Toast.makeText(DashboardActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
 							e.printStackTrace();
 						}
 						
@@ -270,14 +295,14 @@ public class StatusActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_status, menu);
+		getMenuInflater().inflate(R.menu.activity_dashboard, menu);
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
-			case R.id.status_opt_refresh:
+			case R.id.dash_opt_refresh:
 				refresh();
 				return true;
 		

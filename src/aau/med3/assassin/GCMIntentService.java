@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
+import com.google.android.gcm.GCMRegistrar;
 
 // TODO: Implement these methods to provide GCM communication
 public class GCMIntentService extends GCMBaseIntentService {
@@ -40,8 +41,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 	@Override
 	protected void onMessage(Context ctx, Intent intent) {
 		Log.d(TAG, "GCM Message Received!");
-		if(Globals.user != null && Globals.user.loggedIn)
+		String msg = intent.getStringExtra("message");
+		if(Globals.user != null && Globals.user.loggedIn){
 			Globals.user.syncFromServer();
+		}
+			
 
 	}
 

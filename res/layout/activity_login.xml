@@ -72,6 +72,17 @@
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
                 android:text="@string/action_sign_in_register" />
+
+            <Button
+                android:id="@+id/login_btn_sign_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginTop="5dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="Sign Up" />
+
         </LinearLayout>
     </ScrollView>
 

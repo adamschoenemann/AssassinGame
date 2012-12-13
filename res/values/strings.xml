@@ -11,6 +11,6 @@
     <string name="btn_user_info">User Info</string>
     <string name="title_activity_user_info">UserInfoActivity</string>
     <string name="title_activity_features">FeaturesActivity</string>
-    <string name="title_activity_status">Status</string>
+    <string name="title_activity_dashboard">Status</string>
 
 </resources>
