@@ -10,6 +10,7 @@ public class Globals {
 	public final static String ACTION_REFRESH = "aau.med3.assassin.ACTION_REFRESH";
 	public final static String ACTION_LOGGED_IN = "aau.med3.assassin.ACTION_LOGGED_IN";
 	public final static String ACTION_LOGGED_OUT = "aau.med3.assassin.ACTION_LOGGED_OUT";
+	public final static String ACTION_DIED = "aau.med3.assassin.ACTION_DIED";
 	public static User user;
 	public static AssassinService assassinService;
 	public static EventDispatcher events = new EventDispatcher();

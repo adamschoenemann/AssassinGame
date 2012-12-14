@@ -71,6 +71,11 @@ public class DashboardActivity extends Activity {
 					}
 				});
 			}
+			if(action.equals(Globals.ACTION_DIED)){
+				setResult(Activity.RESULT_CANCELED, action, null);
+				Log.d(TAG, "User died!");
+				Toast.makeText(DashboardActivity.this, "You've been killed!", Toast.LENGTH_LONG).show();
+			}
 		}
 		
 	};
@@ -162,12 +167,7 @@ public class DashboardActivity extends Activity {
 			}
 		});
 		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Globals.ACTION_REFRESH);
-		filter.addAction(Globals.ACTION_LOGGED_IN);
-		filter.addAction(Globals.ACTION_LOGGED_OUT);
-		registerReceiver(receiver, filter);
-		
+				
 		bootstrap();
 	}
 	
@@ -212,7 +212,7 @@ public class DashboardActivity extends Activity {
 				String msg = (String) e.data;
 				if(msg.equals(KillAction.SUCCESS)){
 					Globals.user.kill(Globals.user.target_MAC);
-					Toast.makeText(DashboardActivity.this, "Target succesfully killed!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(DashboardActivity.this, "Target succesfully killed! New target acquired! Points increased by 1!", Toast.LENGTH_LONG).show();
 				}
 				if(msg.equals(KillAction.TARGET_NOT_FOUND)){
 					Log.d(TAG, "Target not found");
@@ -236,12 +236,19 @@ public class DashboardActivity extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Globals.ACTION_REFRESH);
+		filter.addAction(Globals.ACTION_LOGGED_IN);
+		filter.addAction(Globals.ACTION_LOGGED_OUT);
+		filter.addAction(Globals.ACTION_DIED);
+		registerReceiver(receiver, filter);
 		refresh();
 	}
 	
 	@Override
 	protected void onPause(){
 		super.onPause();
+		unregisterReceiver(receiver);
 	}
 
 	

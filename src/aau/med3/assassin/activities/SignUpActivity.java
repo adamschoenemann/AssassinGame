@@ -7,8 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gcm.GCMRegistrar;
-
 import aau.med3.assassin.AssassinGame;
 import aau.med3.assassin.Globals;
 import aau.med3.assassin.R;
@@ -21,6 +19,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -33,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.android.gcm.GCMRegistrar;
 
 public class SignUpActivity extends Activity {
 
@@ -185,6 +186,7 @@ public class SignUpActivity extends Activity {
 					
 					public void onClick(DialogInterface dialog, int id){
 						dialog.cancel();
+						startActivity(new Intent(SignUpActivity.this, DashboardActivity.class));
 					}
 				});
 			

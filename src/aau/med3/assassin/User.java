@@ -75,7 +75,7 @@ public class User extends EventDispatcher {
 		json.put("target_MAC", target_MAC);
 		json.put("ID", ID);
 		json.put("points", points);
-		json.put("alive", alive);
+		json.put("alive", (alive) ? 1 : 0);
 		
 		return json;
 		
@@ -98,18 +98,6 @@ public class User extends EventDispatcher {
 		}
 	}
 	
-//	public void load(){
-//
-//		String defValue = "";
-//		email = prefs.getString("email", defValue);
-//		password = prefs.getString("password", defValue);
-//		MAC = prefs.getString(MAC, defValue);
-//		target_MAC = prefs.getString("target_MAC", defValue);
-//		ID = prefs.getInt("ID", 0);
-//		points = prefs.getInt("points", 0);
-//		
-//		loggedIn = true;
-//	}
 	
 	public void kill(String MAC){
 		UserCRUD userCRUD = new UserCRUD();

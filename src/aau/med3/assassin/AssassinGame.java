@@ -74,6 +74,8 @@ public class AssassinGame extends Application {
 
 		
 		Globals.user.removeAllEventListeners();
+		stopService(new Intent(this, AssassinService.class));
+		
 		Globals.user = null;
 		
 		
