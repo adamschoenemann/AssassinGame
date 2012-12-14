@@ -47,6 +47,7 @@ public class DashboardActivity extends Activity {
 	private Button btnKill;
 	private Button btnInfo;
 	private Button btnSync;
+	private Button btnAssView;
 	private View viewLoading;
 	private TextView loadMsg;
 	
@@ -96,6 +97,7 @@ public class DashboardActivity extends Activity {
 		btnKill = (Button) findViewById(R.id.dash_btn_kill);
 		btnInfo = (Button) findViewById(R.id.dash_btn_info);
 		btnSync = (Button) findViewById(R.id.dash_btn_sync);
+		btnAssView = (Button) findViewById(R.id.dash_btn_assassinview);
 		viewLoading = (View) findViewById(R.id.dash_layout_loading);
 		loadMsg = (TextView) findViewById(R.id.dash_loading_msg);
 		
@@ -167,6 +169,14 @@ public class DashboardActivity extends Activity {
 			}
 		});
 		
+		btnAssView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(DashboardActivity.this, AssassinView.class));
+				
+			}
+		});
 				
 		bootstrap();
 	}

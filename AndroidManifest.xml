@@ -68,7 +68,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="aau.med3.assassin.activities.MainActivity" />
         </activity>
-
+        
+		 <activity 
+            android:name="aau.med3.assassin.activities.AssassinView"
+            android:label="@string/title_activity_assassin_view"
+            android:parentActivityName="aau.med3.assassin.activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="aau.med3.assassin.activities.MainActivity" />
+            
+        </activity>
+        
         <service android:name="aau.med3.assassin.AssassinService" >
             <intent-filter>
                 <action android:name="aau.med3.assassin.AssassinService" />
@@ -96,6 +106,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+       
     </application>
 
 </manifest>

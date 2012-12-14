@@ -63,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="Log Out" />
-
             </LinearLayout>
 
             <CheckBox
@@ -73,11 +72,24 @@
                 android:enabled="false"
                 android:text="Alive" />
 
-            <Button
-                android:id="@+id/dash_btn_kill"
-                android:layout_width="136dp"
-                android:layout_height="wrap_content"
-                android:text="Kill" />
+            <LinearLayout
+                android:id="@+id/dash_layout_vert_02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/dash_btn_kill"
+                    android:layout_width="136dp"
+                    android:layout_height="wrap_content"
+                    android:text="Kill" />
+
+                <Button
+                    android:id="@+id/dash_btn_assassinview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Assassin View" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/dash_btn_info"
@@ -90,7 +102,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Synchronize" />
-
         </LinearLayout>
     </ScrollView>
 
@@ -114,7 +125,6 @@
             android:layout_height="wrap_content"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
     </LinearLayout>
 
 </merge>
