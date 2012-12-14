@@ -108,6 +108,10 @@ public class AsyncHttpRequest extends AsyncTask<String, String, String> implemen
 	@Override
 	protected void onPostExecute(String result){
 		super.onPostExecute(result);
+		if(result.equals("")){
+			dispatchEvent(Event.FAILURE, null);
+			return;
+		}
 		dispatchEvent(Event.SUCCESS, result);
 		
 	}

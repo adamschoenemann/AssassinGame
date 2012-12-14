@@ -41,7 +41,7 @@ public class KillAction extends EventDispatcher {
 			allGood = false;
 		if(!sm.isNetworkConnected())
 			allGood = false;
-		if(Globals.user == null || Globals.user.loggedIn == false)
+		if(Globals.user == null || Globals.user.loggedIn == false || Globals.user.alive == false)
 			allGood = false;
 		if(service == null || service.running == false)
 			allGood = false;

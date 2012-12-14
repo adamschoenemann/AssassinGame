@@ -16,7 +16,10 @@ import aau.med3.assassin.events.BluetoothEvent;
 import aau.med3.assassin.events.Event;
 import aau.med3.assassin.events.EventListener;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +38,7 @@ public class DashboardActivity extends Activity {
 	private final static String TAG = "StatusActivity";
 	
 	private CheckBox cbLoggedIn;
+	private CheckBox cbAlive;
 	private CheckBox cbBTEnabled;
 	private CheckBox cbBTDiscoverable;
 	private CheckBox cbNetworkEnabled;
@@ -47,6 +51,29 @@ public class DashboardActivity extends Activity {
 	private TextView loadMsg;
 	
 	private KillAction killAction;
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context ctx, Intent intent) {
+			String action = intent.getAction();
+			Log.d(TAG, action + "broadcast received!");
+			
+			if(action.equals(Globals.ACTION_REFRESH)){
+				refresh();
+			}
+			if(action.equals(Globals.ACTION_LOGGED_IN)){
+				Globals.user.addEventListener(User.UPDATED, new EventListener() {
+					
+					@Override
+					public void handle(Event e) {
+						refresh();
+						
+					}
+				});
+			}
+		}
+		
+	};
 	
 	
 	@Override
@@ -55,6 +82,7 @@ public class DashboardActivity extends Activity {
 		setContentView(R.layout.activity_dashboard);
 
 		cbLoggedIn = (CheckBox) findViewById(R.id.dash_cb_logged_in);
+		cbAlive = (CheckBox) findViewById(R.id.dash_cb_alive);
 		cbBTEnabled = (CheckBox) findViewById(R.id.dash_cb_bt);
 		cbBTDiscoverable = (CheckBox) findViewById(R.id.dash_cb_disc);
 		cbNetworkEnabled = (CheckBox) findViewById(R.id.dash_cb_network);
@@ -109,13 +137,36 @@ public class DashboardActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				if(Globals.user != null && Globals.user.loggedIn == true){
-//					Globals.user.syncToServer();
-					Globals.user.synchronize();
+				User user = Globals.user;
+				if(user != null && user.loggedIn == true){
+					showProgress("Synchronizing...");
+					user.addEventListener(Event.SUCCESS, new SyncHandler());
+					user.addEventListener(Event.FAILURE, new SyncHandler());
+					user.synchronize();
+				}
+				
+			}
+			
+			class SyncHandler implements EventListener {
+
+				@Override
+				public void handle(Event e) {
+					e.target.removeEventListener(Event.SUCCESS, new SyncHandler());
+					e.target.removeEventListener(Event.FAILURE, new SyncHandler());
+					hideProgress();
+					refresh();
+					String msg = (e.name == Event.SUCCESS) ? "Synchronized!" : "Network Error! Synchronization failed";
+					Toast.makeText(DashboardActivity.this, msg, Toast.LENGTH_SHORT).show();
 				}
 				
 			}
 		});
+		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Globals.ACTION_REFRESH);
+		filter.addAction(Globals.ACTION_LOGGED_IN);
+		filter.addAction(Globals.ACTION_LOGGED_OUT);
+		registerReceiver(receiver, filter);
 		
 		bootstrap();
 	}
@@ -133,8 +184,8 @@ public class DashboardActivity extends Activity {
 			return;
 		}
 		
-		viewLoading.setVisibility(View.VISIBLE);
-		loadMsg.setText("Scanning for target...");
+		
+		showProgress("Scanning for target...");
 		
 		// Pause AssassinService
 		service.addEventListener(AssassinService.PAUSED, new EventListener() {
@@ -176,8 +227,7 @@ public class DashboardActivity extends Activity {
 				if(Globals.assassinService != null){
 					Globals.assassinService.startScanning();
 				}
-				viewLoading.setVisibility(View.GONE);
-				loadMsg.setText("");
+				hideProgress();
 			}
 			
 		});
@@ -205,15 +255,7 @@ public class DashboardActivity extends Activity {
 		cbBTDiscoverable.setChecked( (sm.isBTDiscoverable()) ? true : false);
 		
 		User user = Globals.user;
-		if(user != null && user.loggedIn == true){
-			btnLogIn.setVisibility(View.GONE);
-			btnLogIn.setEnabled(false);
-			
-			btnLogOut.setVisibility(View.VISIBLE);
-			btnLogOut.setEnabled(true);
-			
-			cbLoggedIn.setChecked(true);
-		} else {
+		if(user == null){
 			btnLogIn.setEnabled(true);
 			btnLogIn.setVisibility(View.VISIBLE);
 			
@@ -221,9 +263,26 @@ public class DashboardActivity extends Activity {
 			btnLogOut.setEnabled(false);
 			
 			cbLoggedIn.setChecked(false);
+			cbAlive.setChecked(false);
+		} else {
+			if(user.loggedIn == true){
+				btnLogIn.setVisibility(View.GONE);
+				btnLogIn.setEnabled(false);
+				
+				btnLogOut.setVisibility(View.VISIBLE);
+				btnLogOut.setEnabled(true);
+				
+				cbLoggedIn.setChecked(true);
+				if(user.alive){
+					cbAlive.setChecked(true);
+				} else {
+					cbAlive.setChecked(false);
+				}
+			}
 		}
 		
-		Boolean allChecked = (cbNetworkEnabled.isChecked() && cbBTDiscoverable.isChecked() && cbLoggedIn.isChecked()) ;
+		
+		Boolean allChecked = (cbNetworkEnabled.isChecked() && cbBTDiscoverable.isChecked() && cbLoggedIn.isChecked() && cbAlive.isChecked()) ;
 		if(allChecked){
 
 			btnKill.setEnabled(true);
@@ -247,8 +306,8 @@ public class DashboardActivity extends Activity {
 		
 		if(!email.equals("") && !password.equals("") && sm.isNetworkConnected()){
 			try {
-				viewLoading.setVisibility(View.VISIBLE);
-				loadMsg.setText("Logging in " + email);
+				
+				showProgress("Logging in " + email);
 				Log.d(TAG, "Loggin in " + email);
 				
 				UserCRUD crud = new UserCRUD();
@@ -282,14 +341,23 @@ public class DashboardActivity extends Activity {
 			} catch (Exception e){
 				e.printStackTrace();
 			} finally {
-				viewLoading.setVisibility(View.GONE);
-				loadMsg.setText("");
+				hideProgress();
 			}
 			
 		}
 		else {
 			Log.d(TAG, "No persistent user data found");
 		}
+	}
+	
+	public void showProgress(String msg){
+		viewLoading.setVisibility(View.VISIBLE);
+		loadMsg.setText(msg);
+	}
+	
+	public void hideProgress(){
+		viewLoading.setVisibility(View.GONE);
+		loadMsg.setText("");
 	}
 	
 	@Override

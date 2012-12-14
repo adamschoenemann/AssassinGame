@@ -2,20 +2,17 @@ package aau.med3.assassin;
 
 
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import aau.med3.assassin.CRUD.UserCRUD;
-import aau.med3.assassin.events.Event;
-import aau.med3.assassin.events.EventListener;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
-import com.google.android.gcm.GCMRegistrar;
 
 // TODO: Implement these methods to provide GCM communication
 public class GCMIntentService extends GCMBaseIntentService {
@@ -42,6 +39,13 @@ public class GCMIntentService extends GCMBaseIntentService {
 	protected void onMessage(Context ctx, Intent intent) {
 		Log.d(TAG, "GCM Message Received!");
 		String msg = intent.getStringExtra("message");
+		if(msg == "KILL"){
+			
+			if(new StateTracker(ctx).isUserActive()){
+				Intent refreshIntent = new Intent(Globals.ACTION_REFRESH);
+				sendBroadcast(refreshIntent);
+			}
+		}
 		if(Globals.user != null && Globals.user.loggedIn){
 			Globals.user.syncFromServer();
 		}

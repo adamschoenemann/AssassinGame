@@ -53,6 +53,7 @@ public class AssassinGame extends Application {
         }
 		
         Globals.events.dispatchEvent(User.LOGGED_IN, null);
+        sendBroadcast(new Intent(Globals.ACTION_LOGGED_IN));
         
 		// Start assassin service
 		startAssassinService();
@@ -67,7 +68,12 @@ public class AssassinGame extends Application {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.clear();
 		editor.commit();
+		
 		Globals.events.dispatchEvent(User.LOGGED_OUT, null);
+		sendBroadcast(new Intent(Globals.ACTION_LOGGED_OUT));
+
+		
+		Globals.user.removeAllEventListeners();
 		Globals.user = null;
 		
 		

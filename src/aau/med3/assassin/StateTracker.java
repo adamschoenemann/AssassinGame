@@ -46,8 +46,11 @@ public class StateTracker extends EventDispatcher {
 		
 	}
 	
-	public Boolean isUserLoggedIn(){
+	public Boolean isUserActive(){
+		User user = Globals.user;
+		if(user != null && user.loggedIn && user.alive)
+			return true;
 		
-		return true;
+		return false;
 	}
 }

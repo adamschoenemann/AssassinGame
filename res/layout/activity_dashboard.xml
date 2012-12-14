@@ -66,6 +66,13 @@
 
             </LinearLayout>
 
+            <CheckBox
+                android:id="@+id/dash_cb_alive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Alive" />
+
             <Button
                 android:id="@+id/dash_btn_kill"
                 android:layout_width="136dp"

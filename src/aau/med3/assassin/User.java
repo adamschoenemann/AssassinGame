@@ -148,6 +148,7 @@ public class User extends EventDispatcher {
 				try {
 					JSONObject json = ((JSONArray) evt.data).getJSONObject(0);
 					fromJSON(json); // Dispatches UPDATED
+					User.this.dispatchEvent(Event.SUCCESS, null);
 					Log.d(TAG, "Synced from server");
 					
 				} catch (JSONException e) {
@@ -180,7 +181,7 @@ public class User extends EventDispatcher {
 				@Override
 				public void handle(Event e) {
 					Log.d(Globals.DEBUG, "User synchronized to server");
-					
+					User.this.dispatchEvent(Event.SUCCESS, null);
 				}
 				
 			});
