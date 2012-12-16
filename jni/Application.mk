@@ -1,0 +1,1 @@
+APP_CFLAGS = -std=c99

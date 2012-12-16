@@ -72,6 +72,8 @@
 		 <activity 
             android:name="aau.med3.assassin.activities.AssassinView"
             android:label="@string/title_activity_assassin_view"
+            android:screenOrientation="landscape"
+            android:keepScreenOn="true"
             android:parentActivityName="aau.med3.assassin.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

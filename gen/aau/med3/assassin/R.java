@@ -38,7 +38,7 @@ public final class R {
         public static final int dash_loading_msg=0x7f080011;
         public static final int dash_loggedin_layout=0x7f080005;
         public static final int dash_merge_layout=0x7f080000;
-        public static final int dash_opt_refresh=0x7f08002f;
+        public static final int dash_opt_refresh=0x7f080030;
         public static final int dash_scrollview=0x7f080001;
         public static final int email=0x7f080019;
         public static final int form_educations=0x7f08002a;
@@ -56,8 +56,8 @@ public final class R {
         public static final int login_form=0x7f080018;
         public static final int login_status=0x7f080016;
         public static final int login_status_message=0x7f080017;
-        public static final int menu_forgot_password=0x7f080031;
-        public static final int menu_settings=0x7f080030;
+        public static final int menu_forgot_password=0x7f080032;
+        public static final int menu_settings=0x7f080031;
         public static final int password=0x7f08001a;
         public static final int progressBar1=0x7f080010;
         public static final int sign_in_button=0x7f08001c;
@@ -67,6 +67,7 @@ public final class R {
         public static final int signup_layout_container=0x7f080023;
         public static final int signup_status=0x7f08002c;
         public static final int signup_status_text=0x7f08002d;
+        public static final int tutorial2_activity_surface_view=0x7f08002f;
     }
     public static final class layout {
         public static final int activity_dashboard=0x7f030000;
@@ -75,6 +76,7 @@ public final class R {
         public static final int activity_main=0x7f030003;
         public static final int activity_sign_up=0x7f030004;
         public static final int activity_user_info=0x7f030005;
+        public static final int tutorial2_surface_view=0x7f030006;
     }
     public static final class menu {
         public static final int activity_dashboard=0x7f070000;

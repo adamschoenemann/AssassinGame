@@ -23,17 +23,12 @@ import java.io.IOException;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
@@ -61,154 +56,13 @@ public class AssassinView extends Activity {
 		addContentView(mDrawOnTop, new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 	}
+	
+	
 }
 
 // ----------------------------------------------------------------------
 
-class DrawOnTop extends View {
-	Bitmap mBitmap;
 
-	byte[] mYUVData;
-	int[] mRGB;
-	int mImageWidth, mImageHeight;
-
-	Paint mPaint;
-	Rect mRect;
-	
-	public DrawOnTop(Context context) {
-		super(context);
-
-		mPaint = new Paint();
-		mPaint.setColor(Color.BLACK);
-		
-		mRect = new Rect(0, 0, 1, 1);
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		if (mBitmap != null) {
-			int width = canvas.getWidth();
-			int height = canvas.getHeight();
-			
-
-			// Convert from YUV to RGB
-			decodeYUV420SP(mRGB, mYUVData, mImageWidth, mImageHeight);
-			
-			for(int y = 0; y < height; y++){
-				for(int x = 0; x < width; x++){
-					int i = (y*width) + x;
-					int r = getRed(mRGB[i]);
-					int g = getBlue(mRGB[i]);
-					int b = getGreen(mRGB[i]);
-//					Log.d("DRAW", String.format("r: %d, g: %d, b: %d", r, g, b));
-					if(r > g + 30 && r > b + 30){
-//						mRect.set(x, y, x+1, y+1);
-//						Log.d("DRAW", "Blue pixel found!");
-						canvas.drawCircle(x, y, 2, mPaint);
-//						canvas.drawRect(mRect, mPaint);
-					}
-				}
-			}
-			
-//			canvas.drawCircle(30, 30, 50, mPaint);
-
-		} // end if statement
-
-		super.onDraw(canvas);
-
-	} // end onDraw method
-	
-	public int getRed(int in){
-		return ((in >> 16) & 0xff);
-	}
-	
-	public int getGreen(int in){
-		return ((in >> 8) & 0xff);
-	}
-	
-	public int getBlue(int in){
-		return (in & 0xff);
-	}
-	
-	static public void decodeYUV420SP(int[] rgb, byte[] yuv420sp, int width,
-			int height) {
-		final int frameSize = width * height;
-
-		for (int j = 0, yp = 0; j < height; j++) {
-			int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
-			for (int i = 0; i < width; i++, yp++) {
-				int y = (0xff & ((int) yuv420sp[yp])) - 16;
-				if (y < 0)
-					y = 0;
-				if ((i & 1) == 0) { // if i is dividable by two
-					v = (0xff & yuv420sp[uvp++]) - 128;
-					u = (0xff & yuv420sp[uvp++]) - 128;
-				}
-
-				int y1192 = 1192 * y;
-				int r = (y1192 + 1634 * v);
-				int g = (y1192 - 833 * v - 400 * u);
-				int b = (y1192 + 2066 * u);
-
-				if (r < 0)
-					r = 0;
-				else if (r > 262143)
-					r = 262143;
-				if (g < 0)
-					g = 0;
-				else if (g > 262143)
-					g = 262143;
-				if (b < 0)
-					b = 0;
-				else if (b > 262143)
-					b = 262143;
-
-				rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000)
-						| ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
-			}
-		}
-	}
-
-	static public void decodeYUV420SPGrayscale(int[] rgb, byte[] yuv420sp,
-			int width, int height) {
-		final int frameSize = width * height;
-
-		for (int pix = 0; pix < frameSize; pix++) {
-			int pixVal = (0xff & ((int) yuv420sp[pix])) - 16;
-			if (pixVal < 0)
-				pixVal = 0;
-			if (pixVal > 255)
-				pixVal = 255;
-			rgb[pix] = 0xff000000 | (pixVal << 16) | (pixVal << 8) | pixVal;
-		} // pix
-	}
-
-	static public void calculateIntensityHistogram(int[] rgb, int[] histogram,
-			int width, int height, int component) {
-		for (int bin = 0; bin < 256; bin++) {
-			histogram[bin] = 0;
-		} // bin
-		if (component == 0) // red
-		{
-			for (int pix = 0; pix < width * height; pix += 3) {
-				int pixVal = (rgb[pix] >> 16) & 0xff;
-				histogram[pixVal]++;
-			} // pix
-		} else if (component == 1) // green
-		{
-			for (int pix = 0; pix < width * height; pix += 3) {
-				int pixVal = (rgb[pix] >> 8) & 0xff;
-				histogram[pixVal]++;
-			} // pix
-		} else // blue
-		{
-			for (int pix = 0; pix < width * height; pix += 3) {
-				int pixVal = rgb[pix] & 0xff;
-				histogram[pixVal]++;
-			} // pix
-		}
-	}
-}
 
 // ----------------------------------------------------------------------
 
@@ -252,13 +106,13 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 								mDrawOnTop.mImageHeight, Bitmap.Config.ARGB_8888);
 						mDrawOnTop.mRGB = new int[mDrawOnTop.mImageWidth
 								* mDrawOnTop.mImageHeight];
-//						mDrawOnTop.mYUVData = new byte[data.length];
+						mDrawOnTop.mYUVData = new byte[data.length];
 					}
 					
 					// Pass YUV data to draw-on-top companion
-					mDrawOnTop.mYUVData = data;
-//					System.arraycopy(data, 0, mDrawOnTop.mYUVData, 0,
-//							data.length);
+//					mDrawOnTop.mYUVData = data;
+					System.arraycopy(data, 0, mDrawOnTop.mYUVData, 0,
+							data.length);
 					mDrawOnTop.invalidate();
 				}
 			});
@@ -283,10 +137,10 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
-//		parameters.setPreviewSize(320, 240);
+		parameters.setPreviewSize(w, h);
 //		parameters.setPreviewFrameRate(15);
 //		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
-//		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 		mCamera.setParameters(parameters);
 		mCamera.startPreview();
 	}
