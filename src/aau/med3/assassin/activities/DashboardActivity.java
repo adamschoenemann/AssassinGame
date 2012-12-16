@@ -50,6 +50,8 @@ public class DashboardActivity extends Activity {
 	private Button btnAssView;
 	private View viewLoading;
 	private TextView loadMsg;
+	private TextView tvPoints;
+	
 	
 	private KillAction killAction;
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -100,6 +102,9 @@ public class DashboardActivity extends Activity {
 		btnAssView = (Button) findViewById(R.id.dash_btn_assassinview);
 		viewLoading = (View) findViewById(R.id.dash_layout_loading);
 		loadMsg = (TextView) findViewById(R.id.dash_loading_msg);
+		tvPoints = (TextView) findViewById(R.id.dash_tv_points);
+		
+		
 		
 		btnLogIn.setOnClickListener(new OnClickListener(){
 
@@ -221,6 +226,7 @@ public class DashboardActivity extends Activity {
 			public void handle(Event e) {
 				String msg = (String) e.data;
 				if(msg.equals(KillAction.SUCCESS)){
+					
 					Globals.user.kill(Globals.user.target_MAC);
 					Toast.makeText(DashboardActivity.this, "Target succesfully killed! New target acquired! Points increased by 1!", Toast.LENGTH_LONG).show();
 				}
@@ -290,6 +296,7 @@ public class DashboardActivity extends Activity {
 				btnLogOut.setEnabled(true);
 				
 				cbLoggedIn.setChecked(true);
+				tvPoints.setText("Kills: " + String.valueOf(Globals.user.points));
 				if(user.alive){
 					cbAlive.setChecked(true);
 				} else {

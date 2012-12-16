@@ -11,7 +11,7 @@
     <string name="btn_user_info">User Info</string>
     <string name="title_activity_user_info">UserInfoActivity</string>
     <string name="title_activity_features">FeaturesActivity</string>
-    <string name="title_activity_dashboard">Status</string>
+    <string name="title_activity_dashboard">Assassin\'s Geek</string>
     <string name="title_activity_assassin_view">Assassin View</string>
 
 </resources>

@@ -27,7 +27,7 @@ public class User extends EventDispatcher {
 									LOGGED_OUT = "userLoggedOut";
 	
 	public Timestamp timestamp;
-	public String email, MAC, target_MAC, password; 
+	public String email, MAC, target_MAC, password, target_name; 
 	public Integer ID, points;
 	public Boolean loggedIn, alive;
 	public SharedPreferences prefs;
@@ -58,6 +58,7 @@ public class User extends EventDispatcher {
 			points = json.getInt("points");
 			timestamp = timestampFromString(json.getString("timestamp"));
 			alive = (json.getInt("alive") == 1) ? true : false;
+			target_name = json.getString("target_name");
 			loggedIn = true;
 			dispatchEvent(UPDATED, null);
 			dispatchEvent(LOGGED_IN, null);
@@ -75,7 +76,9 @@ public class User extends EventDispatcher {
 		json.put("target_MAC", target_MAC);
 		json.put("ID", ID);
 		json.put("points", points);
+		json.put("target_name", target_name);
 		json.put("alive", (alive) ? 1 : 0);
+		
 		
 		return json;
 		
@@ -93,6 +96,7 @@ public class User extends EventDispatcher {
 			editor.putInt("ID", ID);
 			editor.putInt("points", points);
 			editor.putString("password", password);
+			editor.putString("target_name", target_name);
 			editor.commit();
 			Log.d(TAG, "User saved!");
 		}
@@ -110,6 +114,7 @@ public class User extends EventDispatcher {
 					JSONObject json = data.getJSONObject(0);
 					
 					target_MAC = json.getString("target_MAC");
+					target_name = json.getString("target_name");
 					points++;
 					
 					dispatchEvent(UPDATED, null);

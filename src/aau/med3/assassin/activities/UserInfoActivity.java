@@ -52,6 +52,7 @@ public class UserInfoActivity extends Activity {
 			map.put("Target MAC", user.target_MAC);
 			map.put("Points", user.points);
 			map.put("Alive", user.alive);
+			map.put("Target Name", user.target_name);
 			
 			for (Map.Entry<String, ?> entry : map.entrySet()){
 				String key = entry.getKey();

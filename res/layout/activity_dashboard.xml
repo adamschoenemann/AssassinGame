@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dash_merge_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:layout_marginLeft="0dp" >
 
     <ScrollView
         android:id="@+id/dash_scrollview"
@@ -14,6 +15,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="Connectivity"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <CheckBox
                 android:id="@+id/dash_cb_bt"
@@ -35,6 +44,14 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:text="Network Access" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="User"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
                 android:id="@+id/dash_loggedin_layout"
@@ -72,6 +89,14 @@
                 android:enabled="false"
                 android:text="Alive" />
 
+            <TextView
+                android:id="@+id/dash_tv_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:text="Kills: 0"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
             <LinearLayout
                 android:id="@+id/dash_layout_vert_02"
                 android:layout_width="wrap_content"
@@ -87,7 +112,8 @@
                     android:id="@+id/dash_btn_assassinview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Assassin View" />
+                    android:text="Assassin View"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

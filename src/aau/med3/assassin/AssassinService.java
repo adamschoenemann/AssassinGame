@@ -79,7 +79,7 @@ public class AssassinService extends Service implements IEventDispatcher {
 	
 	private void createNotification(String title, String content, Intent resultIntent){
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-//		.setDefaults(Notification.DEFAULT_VIBRATE)
+		.setDefaults(Notification.DEFAULT_VIBRATE)
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setContentTitle(title)
 		.setContentText(content);
